@@ -14,10 +14,10 @@ $user = get_user();
 $db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
 $db->busyTimeout(1000);
 
-// add species_list_confirmed.txt lines into an array for grepping
-$fp = @fopen($home."/BirdNET-Pi/scripts/species_list_confirmed.txt", 'r');
-if ($fp && filesize($home."/BirdNET-Pi/scripts/species_list_confirmed.txt") > 0) {
-  $confirmed_species = explode("\n", fread($fp, filesize($home."/BirdNET-Pi/scripts/species_list_confirmed.txt")));
+// add confirmed_species_list.txt lines into an array for grepping
+$fp = @fopen($home."/BirdNET-Pi/scripts/confirmed_species_list.txt", 'r');
+if ($fp && filesize($home."/BirdNET-Pi/scripts/confirmed_species_list.txt") > 0) {
+  $confirmed_species = explode("\n", fread($fp, filesize($home."/BirdNET-Pi/scripts/confirmed_species_list.txt")));
 } else {
   $confirmed_species = [];
 }
@@ -78,7 +78,7 @@ if(isset($_GET['excludefile'])) {
 
 if(isset($_GET['confirmspecies'])) {
   if(isset($_GET['confirm_add'])) {
-    $myfile = fopen($home."/BirdNET-Pi/scripts/species_list_confirmed.txt", "a") or die("Unable to open file!");
+    $myfile = fopen($home."/BirdNET-Pi/scripts/confirmed_species_list.txt", "a") or die("Unable to open file!");
     $txt = $_GET['confirmspecies'];
     fwrite($myfile, $txt."\n");
     fclose($myfile);
@@ -89,7 +89,7 @@ if(isset($_GET['confirmspecies'])) {
     $lines = array_filter($confirmed_species, function($line) use ($search) {
       return stripos($line, $search) === false;
     });
-    file_put_contents($home."/BirdNET-Pi/scripts/species_list_confirmed.txt", implode("\n", $lines));
+    file_put_contents($home."/BirdNET-Pi/scripts/confirmed_species_list.txt", implode("\n", $lines));
     echo "OK";
     die();
   }
