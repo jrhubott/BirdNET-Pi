@@ -186,6 +186,8 @@ if(isset($_GET["latitude"])){
     // if this fails don't bother to error check
     $result_color = $statement_color->execute();
     shell_exec("sudo systemctl restart chart_viewer.service");
+    // the sleep allows for the service to restart and image to be generated
+    sleep(5);
   }
 
   $fh = fopen("/etc/birdnet/birdnet.conf", "w");
@@ -659,7 +661,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
 
       <table class="settingstable"><tr><td>
       <h2>Color scheme </h2>
-      Note: when changing themes the daily chart needs a manual refresh before updating.<br><br>
+      Note: when changing themes the daily chart may need a page refresh before updating.<br><br>
       <label for="color_scheme">Color scheme for the site : </label>
       <select name="color_scheme" class="testbtn">
       <?php
