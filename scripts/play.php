@@ -15,9 +15,13 @@ $db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
 $db->busyTimeout(1000);
 
 // add confirmed_species_list.txt lines into an array for grepping
-$fp = @fopen($home."/BirdNET-Pi/scripts/confirmed_species_list.txt", 'r');
-if ($fp && filesize($home."/BirdNET-Pi/scripts/confirmed_species_list.txt") > 0) {
-  $confirmed_species = explode("\n", fread($fp, filesize($home."/BirdNET-Pi/scripts/confirmed_species_list.txt")));
+$confirmedspecies_filename = $home."/BirdNET-Pi/scripts/confirmed_species_list.txt";
+if (!file_exists($confirmedspecies_filename) || filesize($confirmedspecies_filename) == 0) {
+  file_put_contents($confirmedspecies_filename, "# List of confirmed species\n");
+}
+$fp = @fopen($confirmedspecies_filename, 'r');
+if ($fp) {
+  $confirmed_species = explode("\n", fread($fp, filesize($confirmedspecies_filename)));
 } else {
   $confirmed_species = [];
 }
