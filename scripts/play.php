@@ -502,7 +502,7 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
               <img style='display: inline; cursor: pointer;' width=20 src=<?php if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
                 echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
               } else {
-                echo "\"images/qm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
+                echo "\"images/question.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
               }
               ?>>
           </td>
@@ -545,7 +545,7 @@ for ($row = 0; $row < $num_rows; $row++) {
               <img style='display: inline; cursor: pointer;' width=10 src=<?php if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
                 echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
               } else {
-                echo "\"images/qm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
+                echo "\"images/question.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
               }
               ?>>
       </td>
@@ -626,7 +626,7 @@ echo "<table>
   if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
     echo "\"images/check.svg\" title=\"Species not confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
     } else {
-    echo "\"images/qm.svg\" title=\"Species confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
+    echo "\"images/question.svg\" title=\"Species confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
   }
 echo "<br><br><i>$sciname</i></span><br>
     <a href=\"$url\" target=\"_blank\"><img title=\"$url_title\" src=\"images/info.png\" width=\"20\"></a>
@@ -721,7 +721,7 @@ echo "<br><br><i>$sciname</i></span><br>
     if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
       echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
     } else {
-      echo "\"images/qm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
+      echo "\"images/question.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
     }
     echo "><br>
     <i>".$sciname."</i><br>
