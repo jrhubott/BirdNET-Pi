@@ -54,6 +54,8 @@ def show_values_on_bars(ax, label):
                 ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
             case "pink":
                 ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='red')
+            case "blue":
+                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='blue')
             case _:
                 ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
 
@@ -78,6 +80,8 @@ def create_plot(df_plt_today, now, is_top=None):
             f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#77C487')
         case "pink":
             f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#FFE4ED')
+        case "blue":
+            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#DEEFF5')
         case _:
             f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
 
@@ -100,6 +104,9 @@ def create_plot(df_plt_today, now, is_top=None):
             case "pink":
                 pal = "Reds"
                 colors = plt.cm.Reds(norm(confmax)).tolist()
+            case "blue":
+                pal = "Blues"
+                colors = plt.cm.Blues(norm(confmax)).tolist()
             case _:
                 pal = "Greys"
                 colors = plt.cm.Greys(norm(confmax)).tolist()
@@ -156,6 +163,8 @@ def create_plot(df_plt_today, now, is_top=None):
                     label.set_color('yellow')
                 case "pink":
                     label.set_color('red')
+                case "blue":
+                    label.set_color('blue')
                 case _:
                     label.set_color('black')
 
