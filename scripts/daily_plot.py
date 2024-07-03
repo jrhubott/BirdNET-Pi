@@ -75,15 +75,7 @@ def create_plot(df_plt_today, now, is_top=None):
     # Set up plot axes and titles
     height = max(readings / 3, 0) + 1.06
     
-    match get_setting("theme"):
-        case "light":
-            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#77C487')
-        case "pink":
-            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#FFE4ED')
-        case "blue":
-            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#DEEFF5')
-        case _:
-            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
+    f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='none')
 
     # generate y-axis order for all figures based on frequency
     freq_order = df_plt_selection_today['Com_Name'].value_counts().index
