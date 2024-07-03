@@ -500,7 +500,7 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
           <td class="spec">
               <button type="submit" name="species" value="<?php echo $birds[$index];?>"><?php echo $birds[$index];?></button>
               <img style='display: inline; cursor: pointer;' width=20 src=<?php if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
-                echo "\"images/cm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
+                echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
               } else {
                 echo "\"images/qm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
               }
@@ -543,7 +543,7 @@ for ($row = 0; $row < $num_rows; $row++) {
       <td class="spec">
           <button type="submit" name="species" value="<?php echo $birds[$index];?>"><?php echo $birds[$index];?></button>
               <img style='display: inline; cursor: pointer;' width=10 src=<?php if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
-                echo "\"images/cm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
+                echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
               } else {
                 echo "\"images/qm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
               }
@@ -624,7 +624,7 @@ echo "<table>
   <tr><th>$name<span style=\"font-weight:normal;\">
   <img style='display: inline; cursor: pointer;' width=15 src=";
   if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
-    echo "\"images/cm.svg\" title=\"Species not confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
+    echo "\"images/check.svg\" title=\"Species not confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
     } else {
     echo "\"images/qm.svg\" title=\"Species confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
   }
@@ -719,7 +719,7 @@ echo "<br><br><i>$sciname</i></span><br>
     <tr><th>".$name."
     <img style='display: inline; cursor: pointer;' width=10 src=";
     if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
-      echo "\"images/cm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
+      echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
     } else {
       echo "\"images/qm.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
     }
