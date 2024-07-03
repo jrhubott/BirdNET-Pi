@@ -14,6 +14,14 @@ $user = get_user();
 $db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
 $db->busyTimeout(1000);
 
+// add species_list_confirmed.txt lines into an array for grepping
+$fp = @fopen($home."/BirdNET-Pi/scripts/species_list_confirmed.txt", 'r');
+if ($fp && filesize($home."/BirdNET-Pi/scripts/species_list_confirmed.txt") > 0) {
+  $confirmed_species = explode("\n", fread($fp, filesize($home."/BirdNET-Pi/scripts/species_list_confirmed.txt")));
+} else {
+  $confirmed_species = [];
+}
+
 if(isset($_GET['deletefile'])) {
   ensure_authenticated('You must be authenticated to delete files.');
   if (preg_match('~^.*(\.\.\/).+$~', $_GET['deletefile'])) {
@@ -63,6 +71,25 @@ if(isset($_GET['excludefile'])) {
       }
     }
     file_put_contents($home."/BirdNET-Pi/scripts/disk_check_exclude.txt", $result);
+    echo "OK";
+    die();
+  }
+}
+
+if(isset($_GET['confirmspecies'])) {
+  if(isset($_GET['confirm_add'])) {
+    $myfile = fopen($home."/BirdNET-Pi/scripts/species_list_confirmed.txt", "a") or die("Unable to open file!");
+    $txt = $_GET['confirmspecies'];
+    fwrite($myfile, $txt."\n");
+    fclose($myfile);
+    echo "OK";
+    die();
+  } else {
+    $search = $_GET['confirmspecies'];
+    $lines = array_filter($confirmed_species, function($line) use ($search) {
+      return stripos($line, $search) === false;
+    });
+    file_put_contents($home."/BirdNET-Pi/scripts/species_list_confirmed.txt", implode("\n", $lines));
     echo "OK";
     die();
   }
@@ -204,6 +231,22 @@ function deleteDetection(filename,copylink=false) {
     xhttp.open("GET", "play.php?deletefile="+filename, true);
     xhttp.send();
   }
+}
+
+function confirmspecies(species, type) {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+  if(this.responseText == "OK"){
+      location.reload();
+    }
+  }
+  if(type == "add") {
+    xhttp.open("GET", "play.php?confirmspecies="+species+"&confirm_add=true", true);
+  } else {
+    xhttp.open("GET", "play.php?confirmspecies="+species+"&confirm_del=true", true);
+  }
+  xhttp.send();
+  elem.setAttribute("src","images/spinner.gif");
 }
 
 function toggleLock(filename, type, elem) {
@@ -452,6 +495,12 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
           ?>
           <td class="spec">
               <button type="submit" name="species" value="<?php echo $birds[$index];?>"><?php echo $birds[$index];?></button>
+              <img style='display: inline; cursor: pointer;' width=10 src=<?php if (in_array($birds[$index], $confirmed_species)) {
+                echo "\"images/cm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"del\")'";
+              } else {
+                echo "\"images/qm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"add\")'";
+              }
+              ?>>
           </td>
           <?php
         } else {
@@ -489,6 +538,12 @@ for ($row = 0; $row < $num_rows; $row++) {
       ?>
       <td class="spec">
           <button type="submit" name="species" value="<?php echo $birds[$index];?>"><?php echo $birds[$index];?></button>
+              <img style='display: inline; cursor: pointer;' width=10 src=<?php if (in_array($birds[$index], $confirmed_species)) {
+                echo "\"images/cm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"del\")'";
+              } else {
+                echo "\"images/qm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"add\")'";
+              }
+              ?>>
       </td>
       <?php
     } else {
