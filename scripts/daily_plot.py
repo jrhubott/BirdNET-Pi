@@ -15,7 +15,6 @@ from matplotlib.colors import LogNorm
 
 from utils.helpers import DB_PATH, get_settings
 
-
 def get_data(now=None):
     conn = sqlite3.connect(DB_PATH)
     if now is None:
@@ -32,6 +31,13 @@ def get_data(now=None):
 
     return df, now
 
+# Helper function to read a setting from the settings database
+def get_setting(_setting):
+    conn = sqlite3.connect(DB_PATH)
+    df = pd.read_sql_query(f"SELECT value from settings WHERE setting = '{_setting}'", conn)
+    
+    _value = str(df['value'].values[0])
+    return _value
 
 # Function to show value on bars - from https://stackoverflow.com/questions/43214978/seaborn-barplot-displaying-values
 def show_values_on_bars(ax, label):
@@ -43,8 +49,10 @@ def show_values_on_bars(ax, label):
         # Species Count Total
         value = '{:n}'.format(p.get_width())
         bbox = {'facecolor': 'lightgrey', 'edgecolor': 'none', 'pad': 1.0}
-        ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
-
+        if get_setting("theme") == "light" :
+            ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
+        else :
+            ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
 
 def create_plot(df_plt_today, now, is_top=None):
     if is_top is not None:
@@ -61,7 +69,10 @@ def create_plot(df_plt_today, now, is_top=None):
 
     # Set up plot axes and titles
     height = max(readings / 3, 0) + 1.06
-    f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#77C487')
+    if get_setting("theme") == "light" :
+        f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#77C487')
+    else :
+        f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
 
     # generate y-axis order for all figures based on frequency
     freq_order = df_plt_selection_today['Com_Name'].value_counts().index
@@ -75,8 +86,12 @@ def create_plot(df_plt_today, now, is_top=None):
     norm = plt.Normalize(confmax.values.min(), confmax.values.max())
     if is_top or is_top is None:
         # Set Palette for graphics
-        pal = "Greens"
-        colors = plt.cm.Greens(norm(confmax)).tolist()
+        if get_setting("theme") == "light" :
+            pal = "Greens"
+            colors = plt.cm.Greens(norm(confmax)).tolist()
+        else :
+            pal = "Greys"
+            colors = plt.cm.Greys(norm(confmax)).tolist()
         if is_top:
             plot_type = "Top"
         else:
@@ -125,7 +140,10 @@ def create_plot(df_plt_today, now, is_top=None):
     # Set color and weight of tick label for current hour
     for label in plot.get_xticklabels():
         if int(label.get_text()) == now.hour:
-            label.set_color('yellow')
+            if get_setting("theme") == "light" :
+                label.set_color('yellow')
+            else :
+                label.set_color('black')
 
     plot.set_xticklabels(plot.get_xticklabels(), rotation=0, size=8)
 

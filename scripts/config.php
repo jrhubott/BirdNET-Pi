@@ -147,7 +147,6 @@ if(isset($_GET["latitude"])){
     }
   }
 
-
   $contents = file_get_contents("/etc/birdnet/birdnet.conf");
   $contents = preg_replace("/SITE_NAME=.*/", "SITE_NAME=\"$site_name\"", $contents);
   $contents = preg_replace("/LATITUDE=.*/", "LATITUDE=$latitude", $contents);
@@ -176,6 +175,17 @@ if(isset($_GET["latitude"])){
     function() {
       window.parent.document.location.reload();
     }, 1000);</script>";
+
+    $db_color = new SQLite3($home."/BirdNET-Pi/scripts/birds.db", SQLITE3_OPEN_READWRITE);
+    $db_color->busyTimeout(1000);
+    $statement_color = $db_color->prepare('INSERT INTO settings values (?, ?) ON CONFLICT DO UPDATE set value = ? where setting = ?');
+    $statement_color->bindValue(1, 'theme');
+    $statement_color->bindValue(2, $color_scheme);
+    $statement_color->bindValue(3, $color_scheme);
+    $statement_color->bindValue(4, 'theme');
+    // if this fails don't bother to error check
+    $result_color = $statement_color->execute();
+    shell_exec("sudo systemctl restart chart_viewer.service");
   }
 
   $fh = fopen("/etc/birdnet/birdnet.conf", "w");
@@ -649,6 +659,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
 
       <table class="settingstable"><tr><td>
       <h2>Color scheme </h2>
+      Note: when changing themes the daily chart needs a manual refresh before updating.<br><br>
       <label for="color_scheme">Color scheme for the site : </label>
       <select name="color_scheme" class="testbtn">
       <?php
