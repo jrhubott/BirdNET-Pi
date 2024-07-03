@@ -49,10 +49,13 @@ def show_values_on_bars(ax, label):
         # Species Count Total
         value = '{:n}'.format(p.get_width())
         bbox = {'facecolor': 'lightgrey', 'edgecolor': 'none', 'pad': 1.0}
-        if get_setting("theme") == "light" :
-            ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
-        else :
-            ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
+        match get_setting("theme"):
+            case "light":
+                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
+            case "pink":
+                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='red')
+            case _:
+                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
 
 def create_plot(df_plt_today, now, is_top=None):
     if is_top is not None:
@@ -69,10 +72,14 @@ def create_plot(df_plt_today, now, is_top=None):
 
     # Set up plot axes and titles
     height = max(readings / 3, 0) + 1.06
-    if get_setting("theme") == "light" :
-        f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#77C487')
-    else :
-        f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
+    
+    match get_setting("theme"):
+        case "light":
+            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#77C487')
+        case "pink":
+            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#FFE4ED')
+        case _:
+            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
 
     # generate y-axis order for all figures based on frequency
     freq_order = df_plt_selection_today['Com_Name'].value_counts().index
@@ -86,12 +93,16 @@ def create_plot(df_plt_today, now, is_top=None):
     norm = plt.Normalize(confmax.values.min(), confmax.values.max())
     if is_top or is_top is None:
         # Set Palette for graphics
-        if get_setting("theme") == "light" :
-            pal = "Greens"
-            colors = plt.cm.Greens(norm(confmax)).tolist()
-        else :
-            pal = "Greys"
-            colors = plt.cm.Greys(norm(confmax)).tolist()
+        match get_setting("theme"):
+            case "light":
+                pal = "Greens"
+                colors = plt.cm.Greens(norm(confmax)).tolist()
+            case "pink":
+                pal = "Reds"
+                colors = plt.cm.Reds(norm(confmax)).tolist()
+            case _:
+                pal = "Greys"
+                colors = plt.cm.Greys(norm(confmax)).tolist()
         if is_top:
             plot_type = "Top"
         else:
@@ -140,10 +151,13 @@ def create_plot(df_plt_today, now, is_top=None):
     # Set color and weight of tick label for current hour
     for label in plot.get_xticklabels():
         if int(label.get_text()) == now.hour:
-            if get_setting("theme") == "light" :
-                label.set_color('yellow')
-            else :
-                label.set_color('black')
+            match get_setting("theme"):
+                case "light":
+                    label.set_color('yellow')
+                case "pink":
+                    label.set_color('red')
+                case _:
+                    label.set_color('black')
 
     plot.set_xticklabels(plot.get_xticklabels(), rotation=0, size=8)
 
