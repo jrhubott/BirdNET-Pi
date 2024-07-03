@@ -495,7 +495,7 @@ if(!isset($_GET['species']) && !isset($_GET['filename'])){
           ?>
           <td class="spec">
               <button type="submit" name="species" value="<?php echo $birds[$index];?>"><?php echo $birds[$index];?></button>
-              <img style='display: inline; cursor: pointer;' width=10 src=<?php if (in_array($birds[$index], $confirmed_species)) {
+              <img style='display: inline; cursor: pointer;' width=20 src=<?php if (in_array($birds[$index], $confirmed_species)) {
                 echo "\"images/cm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"del\")'";
               } else {
                 echo "\"images/qm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"add\")'";
