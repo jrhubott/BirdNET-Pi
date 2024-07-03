@@ -617,8 +617,14 @@ $sciname = get_sci_name($name);
 $info_url = get_info_url($sciname);
 $url = $info_url['URL'];
 echo "<table>
-  <tr><th>$name<br><span style=\"font-weight:normal;\">
-  <i>$sciname</i></span><br>
+  <tr><th>$name<span style=\"font-weight:normal;\">
+  <img style='display: inline; cursor: pointer;' width=15 src=";
+  if (in_array($birds[$index], $confirmed_species)) {
+    echo "\"images/cm.svg\" title=\"Species not confirmed\" onclick='confirmspecies(\"".$birds[$index]."\",\"del\")'";
+    } else {
+    echo "\"images/qm.svg\" title=\"Species confirmed\" onclick='confirmspecies(\"".$birds[$index]."\",\"add\")'";
+  }
+echo "<br><br><i>$sciname</i></span><br>
     <a href=\"$url\" target=\"_blank\"><img title=\"$url_title\" src=\"images/info.png\" width=\"20\"></a>
     <a href=\"https://wikipedia.org/wiki/$sciname\" target=\"_blank\"><img title=\"Wikipedia\" src=\"images/wiki.png\" width=\"20\"></a>
   </th></tr>";
@@ -706,11 +712,18 @@ echo "<table>
     $info_url = get_info_url($sciname);
     $url = $info_url['URL'];
     echo "<table>
-      <tr><th>$name<br>
-      <i>$sciname</i><br>
-          <a href=\"$url\" target=\"_blank\"><img title=\"$url_title\" src=\"images/info.png\" width=\"20\"></a>
-          <a href=\"https://wikipedia.org/wiki/$sciname\" target=\"_blank\"><img title=\"Wikipedia\" src=\"images/wiki.png\" width=\"20\"></a>
-      </th></tr>";
+    <tr><th>".$name."
+    <img style='display: inline; cursor: pointer;' width=10 src=";
+    if (in_array($birds[$index], $confirmed_species)) {
+      echo "\"images/cm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"del\")'";
+    } else {
+      echo "\"images/qm.svg\" onclick='confirmspecies(\"".$birds[$index]."\",\"add\")'";
+    }
+    echo "><br>
+    <i>".$sciname."</i><br>
+        <a href=\"".$url."\" target=\"_blank\"><img title=\"".$url_title."\" src=\"images/info.png\" width=\"20\"></a>
+        <a href=\"https://wikipedia.org/wiki/".$sciname."\" target=\"_blank\"><img title=\"Wikipedia\" src=\"images/wiki.png\" width=\"20\"></a>
+    </th></tr>";
       while($results=$result2->fetchArray(SQLITE3_ASSOC))
       {
         $comname = preg_replace('/ /', '_', $results['Com_Name']);
