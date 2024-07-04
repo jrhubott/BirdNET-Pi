@@ -622,12 +622,12 @@ $url = $info_url['URL'];
 echo "<table>
   <tr><th>$name<span style=\"font-weight:normal;\">
   <img style='display: inline; cursor: pointer; max-width: 12px; max-height: 12px;' src=";
-  if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
-    echo "\"images/check.svg\" title=\"Species not confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
+  if (in_array(str_replace("'", "", $name), $confirmed_species)) {
+    echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $name)."\",\"del\")'";
     } else {
-    echo "\"images/question.svg\" title=\"Species confirmed\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
-  }
-echo "<br><br><i>$sciname</i></span><br>
+    echo "\"images/question.svg\" onclick='confirmspecies(\"".str_replace("'", "", $name)."\",\"add\")'";
+    };
+echo "><br><br><i>$sciname</i></span><br>
     <a href=\"$url\" target=\"_blank\"><img title=\"$url_title\" src=\"images/info.png\" width=\"20\"></a>
     <a href=\"https://wikipedia.org/wiki/$sciname\" target=\"_blank\"><img title=\"Wikipedia\" src=\"images/wiki.png\" width=\"20\"></a>
   </th></tr>";
@@ -717,11 +717,11 @@ echo "<br><br><i>$sciname</i></span><br>
     echo "<table>
     <tr><th>".$name."
     <img style='display: inline; cursor: pointer; max-width: 12px; max-height: 12px;' src=";
-    if (in_array(str_replace("'", "", $birds[$index]), $confirmed_species)) {
-      echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"del\")'";
-    } else {
-      echo "\"images/question.svg\" onclick='confirmspecies(\"".str_replace("'", "", $birds[$index])."\",\"add\")'";
-    }
+    if (in_array(str_replace("'", "", $name), $confirmed_species)) {
+      echo "\"images/check.svg\" onclick='confirmspecies(\"".str_replace("'", "", $name)."\",\"del\")'";
+      } else {
+      echo "\"images/question.svg\" onclick='confirmspecies(\"".str_replace("'", "", $name)."\",\"add\")'";
+      };
     echo "><br>
     <i>".$sciname."</i><br>
         <a href=\"".$url."\" target=\"_blank\"><img title=\"".$url_title."\" src=\"images/info.png\" width=\"20\"></a>
