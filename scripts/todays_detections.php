@@ -217,8 +217,7 @@ if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true"  ) {
         $image = $_SESSION['images'][$key];
       } else {
         $flickr_cache = $flickr->get_image($todaytable['Sci_Name']);
-        $modaltext = $flickr_cache["author_url"] . "/" . $flickr_cache["id"];
-        array_push($_SESSION["images"], array($comname, $flickr_cache["image_url"], $flickr_cache["title"], $modaltext, $flickr_cache["author_url"], $flickr_cache["license_url"]));
+        array_push($_SESSION["images"], array($comname, $flickr_cache["image_url"], $flickr_cache["title"], $flickr_cache["photos_url"], $flickr_cache["author_url"], $flickr_cache["license_url"]));
         $image = $_SESSION['images'][count($_SESSION['images']) - 1];
       }
     }
@@ -423,7 +422,7 @@ if (get_included_files()[0] === __FILE__) {
     </table></form></div>
 
 
-    <h3>Today's Detections <?php if($kiosk == false) { ?>— <input autocomplete="off" size="11" type="text" placeholder="Search..." id="searchterm" name="searchterm"><?php } ?></h3>
+    <h3>Today's Detections <?php if($kiosk == false) { ?>— <input autocomplete="off" size="18" type="text" placeholder="Search..." id="searchterm" name="searchterm"><?php } ?></h3>
 
     <div style="padding-bottom:10px" id="detections_table"><h3>Loading...</h3></div>
 
