@@ -15,6 +15,7 @@ from matplotlib.colors import LogNorm
 
 from utils.helpers import DB_PATH, get_settings
 
+
 def get_data(now=None):
     conn = sqlite3.connect(DB_PATH)
     if now is None:
@@ -31,16 +32,11 @@ def get_data(now=None):
 
     return df, now
 
-# Helper function to read a setting from the settings database
-def get_setting(_setting):
-    conn = sqlite3.connect(DB_PATH)
-    df = pd.read_sql_query(f"SELECT value from settings WHERE setting = '{_setting}'", conn)
-    
-    _value = str(df['value'].values[0])
-    return _value
 
 # Function to show value on bars - from https://stackoverflow.com/questions/43214978/seaborn-barplot-displaying-values
 def show_values_on_bars(ax, label):
+    conf = get_settings()
+
     for i, p in enumerate(ax.patches):
         x = p.get_x() + p.get_width() * 0.9
         y = p.get_y() + p.get_height() / 2
@@ -49,15 +45,22 @@ def show_values_on_bars(ax, label):
         # Species Count Total
         value = '{:n}'.format(p.get_width())
         bbox = {'facecolor': 'lightgrey', 'edgecolor': 'none', 'pad': 1.0}
-        match get_setting("theme"):
-            case "light":
-                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
-            case "pink":
-                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='red')
-            case "blue":
-                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='blue')
-            case _:
+        match conf['COLOR_SCHEME']:
+            case "dark":
                 ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
+            case _:
+                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
+
+def wrap_width(txt):
+    # try to estimate wrap width
+    w = 16
+    for c in txt:
+        if c in ['M', 'm', 'W', 'w']:
+            w -= 0.33
+        if c in ['I', 'i', 'j', 'l']:
+            w += 0.33
+    return round(w)
+
 
 def create_plot(df_plt_today, now, is_top=None):
     if is_top is not None:
@@ -72,13 +75,15 @@ def create_plot(df_plt_today, now, is_top=None):
 
     df_plt_selection_today = df_plt_today[df_plt_today.Com_Name.isin(plt_selection_today.index)]
 
+    conf = get_settings()
+
     # Set up plot axes and titles
     height = max(readings / 3, 0) + 1.06
-    
-    if get_setting("theme") == "dark":
-        f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
-    else:
-        f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='none')
+    match conf['COLOR_SCHEME']:
+        case "dark":
+            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
+        case _:
+            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='none')
 
     # generate y-axis order for all figures based on frequency
     freq_order = df_plt_selection_today['Com_Name'].value_counts().index
@@ -92,19 +97,13 @@ def create_plot(df_plt_today, now, is_top=None):
     norm = plt.Normalize(confmax.values.min(), confmax.values.max())
     if is_top or is_top is None:
         # Set Palette for graphics
-        match get_setting("theme"):
-            case "light":
-                pal = "Greens"
-                colors = plt.cm.Greens(norm(confmax)).tolist()
-            case "pink":
-                pal = "Reds"
-                colors = plt.cm.Reds(norm(confmax)).tolist()
-            case "blue":
-                pal = "Blues"
-                colors = plt.cm.Blues(norm(confmax)).tolist()
-            case _:
+        match conf['COLOR_SCHEME']:
+            case "dark":
                 pal = "Greys"
                 colors = plt.cm.Greys(norm(confmax)).tolist()
+            case _:
+                pal = "Greens"
+                colors = plt.cm.Greens(norm(confmax)).tolist()
         if is_top:
             plot_type = "Top"
         else:
@@ -125,7 +124,7 @@ def create_plot(df_plt_today, now, is_top=None):
     show_values_on_bars(axs[0], confmax)
 
     # Try plot grid lines between bars - problem at the moment plots grid lines on bars - want between bars
-    yticklabels = ['\n'.join(textwrap.wrap(ticklabel.get_text(), 16)) for ticklabel in plot.get_yticklabels()]
+    yticklabels = ['\n'.join(textwrap.wrap(ticklabel.get_text(), wrap_width(ticklabel.get_text()))) for ticklabel in plot.get_yticklabels()]
     # Next two lines avoid a UserWarning on set_ticklabels() requesting a fixed number of ticks
     yticks = plot.get_yticks()
     plot.set_yticks(yticks)
@@ -153,15 +152,11 @@ def create_plot(df_plt_today, now, is_top=None):
     # Set color and weight of tick label for current hour
     for label in plot.get_xticklabels():
         if int(label.get_text()) == now.hour:
-            match get_setting("theme"):
-                case "light":
-                    label.set_color('yellow')
-                case "pink":
-                    label.set_color('red')
-                case "blue":
-                    label.set_color('blue')
-                case _:
+            match conf['COLOR_SCHEME']:
+                case "dark":
                     label.set_color('black')
+                case _:
+                    label.set_color('yellow')
 
     plot.set_xticklabels(plot.get_xticklabels(), rotation=0, size=8)
 

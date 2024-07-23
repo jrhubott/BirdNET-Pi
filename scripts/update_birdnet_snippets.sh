@@ -181,8 +181,6 @@ if [ -L /usr/local/bin/birdnet_analysis.sh ];then
   rm -f /usr/local/bin/birdnet_analysis.sh
 fi
 
-updatedb.sh
-
 # update snippets above
 
 systemctl daemon-reload

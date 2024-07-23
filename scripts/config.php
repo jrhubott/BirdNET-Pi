@@ -176,15 +176,6 @@ if(isset($_GET["latitude"])){
       window.parent.document.location.reload();
     }, 1000);</script>";
 
-    $db_color = new SQLite3($home."/BirdNET-Pi/scripts/birds.db", SQLITE3_OPEN_READWRITE);
-    $db_color->busyTimeout(1000);
-    $statement_color = $db_color->prepare('INSERT INTO settings values (?, ?) ON CONFLICT DO UPDATE set value = ? where setting = ?');
-    $statement_color->bindValue(1, 'theme');
-    $statement_color->bindValue(2, $color_scheme);
-    $statement_color->bindValue(3, $color_scheme);
-    $statement_color->bindValue(4, 'theme');
-    // if this fails don't bother to error check
-    $result_color = $statement_color->execute();
     shell_exec("sudo systemctl restart chart_viewer.service");
     // the sleep allows for the service to restart and image to be generated
     sleep(5);
