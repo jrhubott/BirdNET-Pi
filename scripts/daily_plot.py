@@ -122,12 +122,15 @@ def create_plot(df_plt_today, now, is_top=None):
     plot = sns.heatmap(heat, norm=LogNorm(),  annot=True,  annot_kws={"fontsize": 7}, fmt="g", cmap=pal, square=False,
                        cbar=False, linewidths=0.5, linecolor="Grey", ax=axs[1], yticklabels=False)
 
+    
     # Set color and weight of tick label for current hour
     for label in plot.get_xticklabels():
         if int(label.get_text()) == now.hour:
             label.set_color('yellow')
 
     plot.set_xticklabels(plot.get_xticklabels(), rotation=0, size=8)
+    plot.tick_params(right=False, top=True, labelright=False, labeltop=True,rotation=0)
+
 
     # Set heatmap border
     for _, spine in plot.spines.items():
@@ -137,7 +140,7 @@ def create_plot(df_plt_today, now, is_top=None):
     plot.set(xlabel="Hour of Day")
     # Set combined plot layout and titles
     y = 1 - 8 / (height * 100)
-    plt.suptitle(f"{plot_type} {readings} Last Updated: {now.strftime('%Y-%m-%d %H:%M')}", y=y)
+    plt.suptitle(f"{plot_type} {readings} Last Updated: {now.strftime('%Y-%m-%d %H:%M')}", y=1)
     f.tight_layout()
     top = 1 - 40 / (height * 100)
     f.subplots_adjust(left=0.125, right=0.9, top=top, wspace=0)
