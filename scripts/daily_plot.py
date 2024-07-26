@@ -157,7 +157,7 @@ def create_plot(df_plt_today, now, is_top=None):
         if int(label.get_text()) == now.hour:
             match conf['COLOR_SCHEME']:
                 case "dark":
-                    label.set_color('black')
+                    label.set_color('blue')
                 case _:
                     label.set_color('yellow')
 
