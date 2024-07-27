@@ -154,7 +154,8 @@ def apprise(file: ParseFileName, detections: [Detection]):
             except BaseException as e:
                 log.exception('Error during Apprise:', exc_info=e)
 
-            species_apprised_this_run.append(detection.species)
+            # send a notification for each detection not just per species
+            # species_apprised_this_run.append(detection.species)
 
 
 def bird_weather(file: ParseFileName, detections: [Detection]):
