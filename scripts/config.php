@@ -656,7 +656,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <label for="color_scheme">Color scheme for the site : </label>
       <select name="color_scheme" class="testbtn">
       <?php
-      $scheme = array("light", "dark");
+      $scheme = array("light", "dark", "purple");
       foreach($scheme as $color_scheme){
           $isSelected = "";
           if($config['COLOR_SCHEME'] == $color_scheme){
