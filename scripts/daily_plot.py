@@ -48,6 +48,8 @@ def show_values_on_bars(ax, label):
         match conf['COLOR_SCHEME']:
             case "dark":
                 ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
+            case "purple":
+                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
             case _:
                 ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
 
@@ -101,6 +103,9 @@ def create_plot(df_plt_today, now, is_top=None):
             case "dark":
                 pal = "Greys"
                 colors = plt.cm.Greys(norm(confmax)).tolist()
+            case "purple":
+                pal = "Purples"
+                colors = plt.cm.Purples(norm(confmax)).tolist()
             case _:
                 pal = "Greens"
                 colors = plt.cm.Greens(norm(confmax)).tolist()
