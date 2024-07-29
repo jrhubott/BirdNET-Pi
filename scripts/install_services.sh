@@ -67,7 +67,6 @@ create_necessary_dirs() {
   sudo -u ${USER} ln -fs $my_dir/exclude_species_list.txt $my_dir/scripts
   sudo -u ${USER} ln -fs $my_dir/include_species_list.txt $my_dir/scripts
   sudo -u ${USER} ln -fs $my_dir/whitelist_species_list.txt $my_dir/scripts
-  sudo -u ${USER} ln -fs $my_dir/confirmed_species_list.txt $my_dir/scripts
   sudo -u ${USER} ln -fs $my_dir/homepage/* ${EXTRACTED}
   sudo -u ${USER} ln -fs $my_dir/model/labels.txt ${my_dir}/scripts
   sudo -u ${USER} ln -fs $my_dir/scripts ${EXTRACTED}
