@@ -84,6 +84,8 @@ def create_plot(df_plt_today, now, is_top=None):
     match conf['COLOR_SCHEME']:
         case "dark":
             f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
+        case "purple":
+            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
         case _:
             f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='none')
 
