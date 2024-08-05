@@ -206,6 +206,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   while($todaytable=$result0->fetchArray(SQLITE3_ASSOC))
   {
     $sciname = $todaytable['Sci_Name'];
+    $sciname_with_underscore = preg_replace('/ /', '_', $sciname);
     $comname = $todaytable['Com_Name'];
     $confidence = $todaytable['Confidence'];
     $filename = $todaytable['File_Name'];
@@ -254,6 +255,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $title = str_replace("\$sens", $sens, $title);
   $title = str_replace("\$overlap", $overlap, $title);
   $title = str_replace("\$flickrimage", $exampleimage, $title);
+  $title = str_replace("\$wikiurl", "https://wikipedia.org/wiki/".$sciname_with_underscore, $title);
   $title = str_replace("\$reason", 'Test message', $title);
 
   $body = str_replace("\$sciname", $sciname, $body);
@@ -271,6 +273,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $body = str_replace("\$sens", $sens, $body);
   $body = str_replace("\$overlap", $overlap, $body);
   $body = str_replace("\$flickrimage", $exampleimage, $body);
+  $body = str_replace("\$wikiurl", "https://wikipedia.org/wiki/".$sciname_with_underscore, $body);
   $body = str_replace("\$reason", 'Test message', $body);
 
   $temp = tmpfile();
@@ -531,6 +534,8 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <dd>Overlap set in "Advanced Settings"</dd>
       <dt>$flickrimage</dt>
       <dd>A preview image of the detected species from Flickr. Set your API key below.</dd>
+      <dt>$wikiurl</dt>
+      <dd>A link to the Wikipedia page</dd>
       <dt>$reason</dt>
       <dd>The reason a notification was sent</dd>
       </dl>

@@ -58,6 +58,7 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
             .replace("$cutoff", cutoff) \
             .replace("$sens", sens) \
             .replace("$flickrimage", image_url if "{" in body else "") \
+            .replace("$wikiurl", "https://wikipedia.org/wiki/" + sciName.replace(' ', '_')) \
             .replace("$overlap", overlap) \
             .replace("$reason", reason)
         return ret
