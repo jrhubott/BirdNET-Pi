@@ -230,6 +230,8 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
 
   $friendlyfilename = "[Listen here](".$filename.")";
 
+  $wikiurl = "https://wikipedia.org/wiki/".preg_replace('/ /', '_', $sciname);
+
   $attach="";
   $exampleimage = "https://live.staticflickr.com/7430/27545810581_8bfa8289a3_c.jpg";
   if (strpos($body, '$flickrimage') !== false) {
@@ -254,7 +256,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $title = str_replace("\$sens", $sens, $title);
   $title = str_replace("\$overlap", $overlap, $title);
   $title = str_replace("\$flickrimage", $exampleimage, $title);
-  $title = str_replace("\$wikiurl", "https://wikipedia.org/wiki/".preg_replace('/ /', '_', $sciname), $title);
+  $title = str_replace("\$wikiurl", $wikiurl, $title);
   $title = str_replace("\$reason", 'Test message', $title);
 
   $body = str_replace("\$sciname", $sciname, $body);
@@ -272,7 +274,7 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $body = str_replace("\$sens", $sens, $body);
   $body = str_replace("\$overlap", $overlap, $body);
   $body = str_replace("\$flickrimage", $exampleimage, $body);
-  $body = str_replace("\$wikiurl", "https://wikipedia.org/wiki/".preg_replace('/ /', '_', $sciname), $body);
+  $body = str_replace("\$wikiurl", $wikiurl, $body);
   $body = str_replace("\$reason", 'Test message', $body);
 
   $temp = tmpfile();
