@@ -139,7 +139,7 @@ def write_to_json_file(file: ParseFileName, detections: [Detection]):
     log.debug(f'DONE! WROTE {len(detections)} RESULTS.')
 
 
-def apprise(file: ParseFileName, detections: [Detection], test_msg = False):
+def apprise(file: ParseFileName, detections: [Detection], test_msg=False):
     species_apprised_this_run = []
     conf = get_settings()
 

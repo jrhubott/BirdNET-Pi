@@ -7,7 +7,6 @@ import socket
 import sqlite3
 import time as timeim
 
-from apprise import NotifyFormat
 from datetime import datetime
 
 log = logging.getLogger(__name__)
