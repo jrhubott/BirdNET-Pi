@@ -1,10 +1,10 @@
 import apprise
+import html
 import logging
 import os
+import requests
 import socket
 import sqlite3
-import requests
-import html
 import time as timeim
 
 from apprise import NotifyFormat
@@ -136,10 +136,8 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
                 image_url = flickr_images[comName]
 
         if test_msg:
-            log.info("BJD HERE WOO")
-            log.info(body)
             notify_body = render_template(body, "Test message")
-            notify_title = render_template(title, "detection")
+            notify_title = render_template(title, "Test message")
             notify(notify_body, notify_title, image_url)
             return
 
