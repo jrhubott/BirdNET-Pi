@@ -1,6 +1,5 @@
 import apprise
 import html
-import logging
 import os
 import requests
 import socket
@@ -8,8 +7,6 @@ import sqlite3
 import time as timeim
 
 from datetime import datetime
-
-log = logging.getLogger(__name__)
 
 userDir = os.path.expanduser('~')
 APPRISE_CONFIG = userDir + '/BirdNET-Pi/apprise.txt'
@@ -68,7 +65,7 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
             .replace("$newLine", "<br/>")
         return ret
     # print(sendAppriseNotifications)
-    # log.info(settings_dict)
+    # print(settings_dict)
 
     if os.path.exists(APPRISE_CONFIG) and os.path.getsize(APPRISE_CONFIG) > 0:
 
