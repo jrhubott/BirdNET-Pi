@@ -1,5 +1,7 @@
 import datetime
 import glob
+import json
+import logging
 import os
 import re
 import subprocess
@@ -7,6 +9,8 @@ from configparser import ConfigParser
 from itertools import chain
 
 from tzlocal import get_localzone
+
+log = logging.getLogger(__name__)
 
 _settings = None
 
@@ -62,6 +66,11 @@ class ParseFileName:
         time_created = re.search('[0-9]+:[0-9]+:[0-9]+$', name).group()
         self.file_date = datetime.datetime.strptime(f'{date_created}T{time_created}', "%Y-%m-%dT%H:%M:%S")
         self.root = name
+
+        #log.info("BJD " + file_name)
+        #log.info("BJD " + name)
+        #log.info("BJD " + date_created)
+        #log.info("BJD " + time_created)
 
         ident_match = re.search("RTSP_[0-9]+-", file_name)
         self.RTSP_id = ident_match.group() if ident_match is not None else ""

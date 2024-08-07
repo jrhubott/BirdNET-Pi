@@ -1,12 +1,15 @@
+import json
 import logging
 import os
 import os.path
+import pathlib
 import re
 import signal
 import sys
 import threading
 from queue import Queue
 from subprocess import CalledProcessError
+from utils.helpers import Detection
 
 import inotify.adapters
 from inotify.constants import IN_CLOSE_WRITE
@@ -59,11 +62,36 @@ def main():
             continue
 
         (_, type_names, path, file_name) = event
-        if re.search('.wav$', file_name) is None:
-            continue
-        log.debug("PATH=[%s] FILENAME=[%s] EVENT_TYPES=%s", path, file_name, type_names)
 
         file_path = os.path.join(path, file_name)
+        
+        if re.match('send_test_notification.txt', file_name):
+            log.info("Sending test notification")
+            
+            notify_file = open(file_path, "r")
+            start = notify_file.readline() 
+            stop = notify_file.readline()
+            confidence = notify_file.readline()
+            species = notify_file.readline()
+            filename = notify_file.readline()
+            date_time = notify_file.readline()
+            notify_file.close()
+            pathlib.Path.unlink(file_path)
+            
+            detections = []
+            detection = Detection(start, stop, species, confidence)
+            detection.file_name_extr = filename
+            detections.append(detection)
+
+            file = ParseFileName(date_time)
+            apprise(file, detections, test_msg = True) 
+            continue
+
+        if re.search('.wav$', file_name) is None:
+            continue
+
+        log.debug("PATH=[%s] FILENAME=[%s] EVENT_TYPES=%s", path, file_name, type_names)
+
         if file_path in backlog:
             # if we're very lucky, the first event could be for the file in the backlog that finished
             # while running get_wav_files()

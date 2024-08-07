@@ -1,11 +1,16 @@
 import apprise
+import logging
 import os
 import socket
 import sqlite3
-from datetime import datetime
 import requests
 import html
 import time as timeim
+
+from apprise import NotifyFormat
+from datetime import datetime
+
+log = logging.getLogger(__name__)
 
 userDir = os.path.expanduser('~')
 APPRISE_CONFIG = userDir + '/BirdNET-Pi/apprise.txt'
@@ -42,7 +47,7 @@ def notify(body, title, attached=""):
 
 def sendAppriseNotifications(species, confidence, confidencepct, path,
                              date, time, week, latitude, longitude, cutoff,
-                             sens, overlap, settings_dict, db_path=DB_PATH):
+                             sens, overlap, settings_dict, db_path=DB_PATH, test_msg=False):
     def render_template(template, reason=""):
         ret = template.replace("$sciname", sciName) \
             .replace("$comname", comName) \
@@ -58,15 +63,23 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
             .replace("$cutoff", cutoff) \
             .replace("$sens", sens) \
             .replace("$flickrimage", image_url if "{" in body else "") \
+            .replace("$wikiurl", wikiurl) \
             .replace("$overlap", overlap) \
-            .replace("$reason", reason)
+            .replace("$reason", reason) \
+            .replace("$newLine", "<br/>")
         return ret
     # print(sendAppriseNotifications)
-    # print(settings_dict)
+    log.info(settings_dict)
+
     if os.path.exists(APPRISE_CONFIG) and os.path.getsize(APPRISE_CONFIG) > 0:
 
         title = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_TITLE'))
         body = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_BODY'))
+
+        log.info("BJD WTF")
+        log.info(body)
+        log.info("BJD WTF")
+
         sciName, comName = species.split("_")
 
         APPRISE_ONLY_NOTIFY_SPECIES_NAMES = settings_dict.get('APPRISE_ONLY_NOTIFY_SPECIES_NAMES')
@@ -99,6 +112,7 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
 
         listenurl = websiteurl+"?filename="+path
         friendlyurl = "[Listen here]("+listenurl+")"
+        wikiurl = "https://wikipedia.org/wiki/" + sciName.replace(' ', '_')
         image_url = ""
 
         if len(settings_dict.get('FLICKR_API_KEY')) > 0 and "$flickrimage" in body:
@@ -120,6 +134,14 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
                     image_url = ""
             else:
                 image_url = flickr_images[comName]
+
+        if test_msg:
+            log.info("BJD HERE WOO")
+            log.info(body)
+            notify_body = render_template(body, "Test message")
+            notify_title = render_template(title, "detection")
+            notify(notify_body, notify_title, image_url)
+            return
 
         if settings_dict.get('APPRISE_NOTIFY_EACH_DETECTION') == "1":
             notify_body = render_template(body, "detection")

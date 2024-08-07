@@ -139,7 +139,7 @@ def write_to_json_file(file: ParseFileName, detections: [Detection]):
     log.debug(f'DONE! WROTE {len(detections)} RESULTS.')
 
 
-def apprise(file: ParseFileName, detections: [Detection]):
+def apprise(file: ParseFileName, detections: [Detection], test_msg = False):
     species_apprised_this_run = []
     conf = get_settings()
 
@@ -150,7 +150,7 @@ def apprise(file: ParseFileName, detections: [Detection]):
                 sendAppriseNotifications(detection.species, str(detection.confidence), str(detection.confidence_pct),
                                          os.path.basename(detection.file_name_extr), file.date, file.time, str(file.week),
                                          conf['LATITUDE'], conf['LONGITUDE'], conf['CONFIDENCE'], conf['SENSITIVITY'],
-                                         conf['OVERLAP'], dict(conf), DB_PATH)
+                                         conf['OVERLAP'], dict(conf), DB_PATH, test_msg)
             except BaseException as e:
                 log.exception('Error during Apprise:', exc_info=e)
 
