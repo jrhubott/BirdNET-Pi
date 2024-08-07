@@ -1,4 +1,3 @@
-import inotify.adapters
 import json
 import logging
 import os
@@ -8,14 +7,14 @@ import re
 import signal
 import sys
 import threading
-
-from inotify.constants import IN_CLOSE_WRITE
 from queue import Queue
 from subprocess import CalledProcessError
-from utils.helpers import Detection
+
+import inotify.adapters
+from inotify.constants import IN_CLOSE_WRITE
 
 from server import load_global_model, run_analysis
-from utils.helpers import get_settings, ParseFileName, get_wav_files, ANALYZING_NOW
+from utils.helpers Detection, import get_settings, ParseFileName, get_wav_files, ANALYZING_NOW
 from utils.reporting import extract_detection, summary, write_to_file, write_to_db, apprise, bird_weather, heartbeat, \
     update_json_file
 
