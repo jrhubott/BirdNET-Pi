@@ -68,16 +68,12 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
             .replace("$newLine", "<br/>")
         return ret
     # print(sendAppriseNotifications)
-    log.info(settings_dict)
+    # log.info(settings_dict)
 
     if os.path.exists(APPRISE_CONFIG) and os.path.getsize(APPRISE_CONFIG) > 0:
 
         title = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_TITLE'))
         body = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_BODY'))
-
-        log.info("BJD WTF")
-        log.info(body)
-        log.info("BJD WTF")
 
         sciName, comName = species.split("_")
 

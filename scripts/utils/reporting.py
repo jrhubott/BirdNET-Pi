@@ -139,9 +139,14 @@ def write_to_json_file(file: ParseFileName, detections: [Detection]):
     log.debug(f'DONE! WROTE {len(detections)} RESULTS.')
 
 
-def apprise(file: ParseFileName, detections: [Detection], test_msg=False):
+def apprise(file: ParseFileName, detections: [Detection], test_title="", test_body=""):
     species_apprised_this_run = []
     conf = get_settings()
+
+    if test_title:
+        conf['APPRISE_NOTIFICATION_TITLE'] = test_title
+    if test_body:
+        conf['APPRISE_NOTIFICATION_BODY'] = test_body
 
     for detection in detections:
         # Apprise of detection if not already alerted this run.
@@ -150,7 +155,7 @@ def apprise(file: ParseFileName, detections: [Detection], test_msg=False):
                 sendAppriseNotifications(detection.species, str(detection.confidence), str(detection.confidence_pct),
                                          os.path.basename(detection.file_name_extr), file.date, file.time, str(file.week),
                                          conf['LATITUDE'], conf['LONGITUDE'], conf['CONFIDENCE'], conf['SENSITIVITY'],
-                                         conf['OVERLAP'], dict(conf), DB_PATH, test_msg)
+                                         conf['OVERLAP'], dict(conf), DB_PATH, True if test_title or test_body else False)
             except BaseException as e:
                 log.exception('Error during Apprise:', exc_info=e)
 

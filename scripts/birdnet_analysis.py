@@ -73,6 +73,8 @@ def main():
             species = notify_file.readline()
             filename = notify_file.readline()
             date_time = notify_file.readline()
+            new_title = notify_file.readline()
+            new_body = notify_file.readline()
             notify_file.close()
             pathlib.Path.unlink(file_path)
 
@@ -82,7 +84,7 @@ def main():
             detections.append(detection)
 
             file = ParseFileName(date_time)
-            apprise(file, detections, test_msg=True)
+            apprise(file, detections, test_title=new_title, test_body=new_body)
             continue
 
         if re.search('.wav$', file_name) is None:
