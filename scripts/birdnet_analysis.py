@@ -84,7 +84,7 @@ def main():
             detections.append(detection)
 
             file = ParseFileName(date_time)
-            apprise(file, detections, test_title=new_title, test_body=new_body)
+            apprise(file, detections, title=new_title, body=new_body)
             continue
 
         if re.search('.wav$', file_name) is None:

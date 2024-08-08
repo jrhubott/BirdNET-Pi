@@ -61,8 +61,7 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
             .replace("$flickrimage", image_url if "{" in body else "") \
             .replace("$wikiurl", wikiurl) \
             .replace("$overlap", overlap) \
-            .replace("$reason", reason) \
-            .replace("$newLine", "<br/>")
+            .replace("$reason", reason)
         return ret
     # print(sendAppriseNotifications)
     # print(settings_dict)
