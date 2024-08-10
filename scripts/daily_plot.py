@@ -165,6 +165,8 @@ def create_plot(df_plt_today, now, is_top=None):
             match conf['COLOR_SCHEME']:
                 case "dark":
                     label.set_color('blue')
+                case "purple":
+                    label.set_color('blue')
                 case _:
                     label.set_color('yellow')
 
