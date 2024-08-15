@@ -227,7 +227,11 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   fwrite($test_file, $_GET['apprise_notification_title'].PHP_EOL);
   fwrite($test_file, $_GET['apprise_notification_body'].PHP_EOL);
   fclose($test_file);
- 
+
+  $apprise_test_config = fopen($home."/BirdNET-Pi/apprise_test.txt", "w") or die("Unable to open file!");
+  fwrite($apprise_test_config, $_GET['apprise_config']);
+  fclose($apprise_test_config);
+
   die();
 }
 
