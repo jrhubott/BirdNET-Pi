@@ -483,8 +483,6 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <dd>A preview image of the detected species from Flickr. Set your API key below.</dd>
       <dt>$reason</dt>
       <dd>The reason a notification was sent</dd>
-      <dt>$newLine</dt>
-      <dd>Add a line break</dd>
       </dl>
       <p>Use the variables defined above to customize your notification title and body.</p>
       <label for="apprise_notification_title">Notification Title: </label>
@@ -681,7 +679,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <input type="hidden" name="status" value="success">
       <input type="hidden" name="submit" value="settings">
 <div class="float">
-     <button type="submit" id="basicformsubmit" onclick="if(document.getElementById('basicform').checkValidity()){this.innerHTML = 'Updating... please wait.';this.classList.add('disabled')}" name="view" value="Settings">
+      <button type="submit" id="basicformsubmit" onclick="if(document.getElementById('basicform').checkValidity()){this.innerHTML = 'Updating... please wait.';this.classList.add('disabled')}" name="view" value="Settings">
 <?php
 if(isset($_GET['status'])){
   echo '<script>alert("Settings successfully updated");</script>';
