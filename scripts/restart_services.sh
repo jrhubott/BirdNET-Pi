@@ -14,7 +14,6 @@ services=(chart_viewer.service
   birdnet_analysis.service
   birdnet_log.service
   birdnet_stats.service
-  docker.service
 )
 
 
