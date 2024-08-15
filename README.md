@@ -14,7 +14,9 @@ Icon made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from 
 </p>
 
 ## About this fork:
-I've been building on [mcguirepr89's](https://github.com/mcguirepr89/BirdNET-Pi) most excellent work to further update and improve BirdNET-Pi. Maybe someone will find it useful.
+This is a fork from [Nachtzuster](https://github.com/Nachtzuster/BirdNET-Pi), who has been building from the original BirdNET-Pi. So far I've opened pull requests for all of my changes to Nachtzuster's repo also, but incase they don't get approved I'm putting them here. 
+
+Nachtzuster has been building on [mcguirepr89's](https://github.com/mcguirepr89/BirdNET-Pi) most excellent work to further update and improve BirdNET-Pi. Maybe someone will find it useful.
 
 Changes include:
 
