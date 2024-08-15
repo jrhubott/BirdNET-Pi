@@ -67,11 +67,13 @@ if(isset($_GET["latitude"])){
   $timezone = $_GET["timezone"];
   $model = $_GET["model"];
   $sf_thresh = $_GET["sf_thresh"];
+
   if(isset($_GET['data_model_version'])) {
     $data_model_version = 2;
   } else {
     $data_model_version = 1;
   }
+
   $only_notify_species_names = $_GET['only_notify_species_names'];
   $only_notify_species_names_2 = $_GET['only_notify_species_names_2'];
 
@@ -130,6 +132,7 @@ if(isset($_GET["latitude"])){
       sleep(3);
     }
   }
+
   if ($model != $config['MODEL'] || $language != $config['DATABASE_LANG']){
     if(strlen($language) == 2){
 
@@ -211,78 +214,20 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
     $filename = $todaytable['File_Name'];
     $date = $todaytable['Date'];
     $time = $todaytable['Time'];
-    $week = $todaytable['Week'];
-    $latitude = $todaytable['Lat'];
-    $longitude = $todaytable['Lon'];
-    $cutoff = $todaytable['Cutoff'];
-    $sens = $todaytable['Sens'];
-    $overlap = $todaytable['Overlap'];
   }
 
-  $title = $_GET['apprise_notification_title'];
-  $body = $_GET['apprise_notification_body'];
-
-  if($config["BIRDNETPI_URL"] != "") {
-    $filename = $config["BIRDNETPI_URL"]."?filename=".$filename;
-  } else{
-    $filename = "http://".$_SERVER['SERVER_NAME']."/"."?filename=".$filename;
-  }
-
-  $friendlyfilename = "[Listen here](".$filename.")";
-
-  $wikiurl = "https://wikipedia.org/wiki/".preg_replace('/ /', '_', $sciname);
-
-  $attach="";
-  $exampleimage = "https://live.staticflickr.com/7430/27545810581_8bfa8289a3_c.jpg";
-  if (strpos($body, '$flickrimage') !== false) {
-      $attach = "--attach ".$exampleimage;
-  }
-  if (strpos($body, '{') === false) {
-      $exampleimage = "";
-  }
-
-  $title = str_replace("\$sciname", $sciname, $title);
-  $title = str_replace("\$comname", $comname, $title);
-  $title = str_replace("\$confidencepct", round($confidence*100), $title);
-  $title = str_replace("\$confidence", $confidence, $title);
-  $title = str_replace("\$listenurl", $filename, $title);
-  $title = str_replace("\$friendlyurl", $friendlyfilename, $title);
-  $title = str_replace("\$date", $date, $title);
-  $title = str_replace("\$time", $time, $title);
-  $title = str_replace("\$week", $week, $title);
-  $title = str_replace("\$latitude", $latitude, $title);
-  $title = str_replace("\$longitude", $longitude, $title);
-  $title = str_replace("\$cutoff", $cutoff, $title);
-  $title = str_replace("\$sens", $sens, $title);
-  $title = str_replace("\$overlap", $overlap, $title);
-  $title = str_replace("\$flickrimage", $exampleimage, $title);
-  $title = str_replace("\$wikiurl", $wikiurl, $title);
-  $title = str_replace("\$reason", 'Test message', $title);
-
-  $body = str_replace("\$sciname", $sciname, $body);
-  $body = str_replace("\$comname", $comname, $body);
-  $body = str_replace("\$confidencepct", round($confidence*100), $body);
-  $body = str_replace("\$confidence", $confidence, $body);
-  $body = str_replace("\$listenurl", $filename, $body);
-  $body = str_replace("\$friendlyurl", $friendlyfilename, $body);
-  $body = str_replace("\$date", $date, $body);
-  $body = str_replace("\$time", $time, $body);
-  $body = str_replace("\$week", $week, $body);
-  $body = str_replace("\$latitude", $latitude, $body);
-  $body = str_replace("\$longitude", $longitude, $body);
-  $body = str_replace("\$cutoff", $cutoff, $body);
-  $body = str_replace("\$sens", $sens, $body);
-  $body = str_replace("\$overlap", $overlap, $body);
-  $body = str_replace("\$flickrimage", $exampleimage, $body);
-  $body = str_replace("\$wikiurl", $wikiurl, $body);
-  $body = str_replace("\$reason", 'Test message', $body);
-
-  $temp = tmpfile();
-  $tpath = stream_get_meta_data($temp)['uri'];
-  fwrite($temp, $body);
-  echo "<pre class=\"bash\">".shell_exec($home."/BirdNET-Pi/birdnet/bin/apprise -vv --plugin-path ".$home."/.apprise/plugins "." -t '".escapeshellcmd($title)."' ".$attach." ".$cf." <".$tpath)."</pre>";
-  fclose($temp);
-
+  $test_file = fopen($config["RECS_DIR"]."/"."StreamData"."/"."send_test_notification.txt", "w") or die("Unable to open file!");
+ 
+  fwrite($test_file, "1.0".PHP_EOL);
+  fwrite($test_file, "3.0".PHP_EOL);
+  fwrite($test_file, $confidence.PHP_EOL);
+  fwrite($test_file, $sciname."_".$comname.PHP_EOL);
+  fwrite($test_file, $filename.PHP_EOL);
+  fwrite($test_file, $date."-birdnet-".$time.PHP_EOL);
+  fwrite($test_file, $_GET['apprise_notification_title'].PHP_EOL);
+  fwrite($test_file, $_GET['apprise_notification_body'].PHP_EOL);
+  fclose($test_file);
+ 
   die();
 }
 
@@ -308,6 +253,7 @@ $config = get_config($force_reload=true);
     }
   });
 }, false);
+
 function sendTestNotification(e) {
   document.getElementById("testsuccessmsg").innerHTML = "";
   e.classList.add("disabled");

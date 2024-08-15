@@ -1,11 +1,12 @@
 import apprise
+import html
 import os
+import requests
 import socket
 import sqlite3
-from datetime import datetime
-import requests
-import html
 import time as timeim
+
+from datetime import datetime
 
 userDir = os.path.expanduser('~')
 APPRISE_CONFIG = userDir + '/BirdNET-Pi/apprise.txt'
@@ -42,7 +43,7 @@ def notify(body, title, attached=""):
 
 def sendAppriseNotifications(species, confidence, confidencepct, path,
                              date, time, week, latitude, longitude, cutoff,
-                             sens, overlap, settings_dict, db_path=DB_PATH):
+                             sens, overlap, settings_dict, db_path=DB_PATH, test_msg=False):
     def render_template(template, reason=""):
         ret = template.replace("$sciname", sciName) \
             .replace("$comname", comName) \
@@ -64,10 +65,12 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
         return ret
     # print(sendAppriseNotifications)
     # print(settings_dict)
+
     if os.path.exists(APPRISE_CONFIG) and os.path.getsize(APPRISE_CONFIG) > 0:
 
         title = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_TITLE'))
         body = html.unescape(settings_dict.get('APPRISE_NOTIFICATION_BODY'))
+
         sciName, comName = species.split("_")
 
         APPRISE_ONLY_NOTIFY_SPECIES_NAMES = settings_dict.get('APPRISE_ONLY_NOTIFY_SPECIES_NAMES')
@@ -122,6 +125,12 @@ def sendAppriseNotifications(species, confidence, confidencepct, path,
                     image_url = ""
             else:
                 image_url = flickr_images[comName]
+
+        if test_msg:
+            notify_body = render_template(body, "Test message")
+            notify_title = render_template(title, "Test message")
+            notify(notify_body, notify_title, image_url)
+            return
 
         if settings_dict.get('APPRISE_NOTIFY_EACH_DETECTION') == "1":
             notify_body = render_template(body, "detection")
