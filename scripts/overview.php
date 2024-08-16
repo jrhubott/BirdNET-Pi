@@ -378,7 +378,7 @@ function refreshCustomImage(){
 }
 function startAutoRefresh() {
     i_fn1 = window.setInterval(function(){
-                    document.getElementById("spectrogramimage").src = "/spectrogram.png?nocache="+Date.now();
+                    document.getElementById("spectrogramimage").src = "spectrogram.png?nocache="+Date.now();
                     }, <?php echo $refresh; ?>*1000);
     i_fn2 = window.setInterval(refreshDetection, <?php echo intval($dividedrefresh); ?>*1000);
     if (customImage) i_fn3 = window.setInterval(refreshCustomImage, 1000);
