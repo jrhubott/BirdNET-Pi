@@ -42,7 +42,7 @@ def get_settings(settings_path='/etc/birdnet/birdnet.conf', force_reload=False):
 
 
 class Detection:
-    def __init__(self, start_time, stop_time, species, confidence, file_name):
+    def __init__(self, start_time, stop_time, species, confidence, file_name, RTSP_id):
         self.start = float(start_time)
         self.stop = float(stop_time)
         self.confidence = round(float(confidence), 4)
@@ -53,6 +53,7 @@ class Detection:
         self.common_name_safe = self.common_name.replace("'", "").replace(" ", "_")
         self.file_name = file_name
         self.file_name_extr = None
+        self.RTSP_id = RTSP_id;
 
 
 class ParseFileName:
