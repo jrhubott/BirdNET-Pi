@@ -42,7 +42,7 @@ def notify(body, title, attached=""):
         )
 
 
-def sendAppriseNotifications(species, confidence, confidencepct, path, RTSP_id, 
+def sendAppriseNotifications(species, confidence, confidencepct, path,
                              date, time, week, latitude, longitude, cutoff,
                              sens, overlap, settings_dict, db_path=DB_PATH, test_msg=False):
     def render_template(template, reason=""):
@@ -62,8 +62,7 @@ def sendAppriseNotifications(species, confidence, confidencepct, path, RTSP_id,
             .replace("$flickrimage", image_url if "{" in body else "") \
             .replace("$wikiurl", wikiurl) \
             .replace("$overlap", overlap) \
-            .replace("$reason", reason) \
-            .replace("$RTSP_id", RTSP_id)
+            .replace("$reason", reason)
         return ret
     # print(sendAppriseNotifications)
     # print(settings_dict)

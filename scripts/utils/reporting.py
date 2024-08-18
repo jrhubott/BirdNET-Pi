@@ -153,7 +153,7 @@ def apprise(file: ParseFileName, detections: [Detection], title="", body=""):
         if detection.species not in species_apprised_this_run:
             try:
                 sendAppriseNotifications(detection.species, str(detection.confidence), str(detection.confidence_pct),
-                                         os.path.basename(detection.file_name_extr), detection.RTSP_id, file.date, file.time, str(file.week),
+                                         os.path.basename(detection.file_name_extr), file.date, file.time, str(file.week),
                                          conf['LATITUDE'], conf['LONGITUDE'], conf['CONFIDENCE'], conf['SENSITIVITY'],
                                          conf['OVERLAP'], dict(conf), DB_PATH, True if title or body else False)
             except BaseException as e:
