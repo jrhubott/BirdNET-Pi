@@ -42,7 +42,7 @@ def get_settings(settings_path='/etc/birdnet/birdnet.conf', force_reload=False):
 
 
 class Detection:
-    def __init__(self, start_time, stop_time, species, confidence):
+    def __init__(self, start_time, stop_time, species, confidence, file_name):
         self.start = float(start_time)
         self.stop = float(stop_time)
         self.confidence = round(float(confidence), 4)
@@ -51,6 +51,7 @@ class Detection:
         self.scientific_name = species.split('_')[0]
         self.common_name = species.split('_')[1]
         self.common_name_safe = self.common_name.replace("'", "").replace(" ", "_")
+        self.file_name = file_name
         self.file_name_extr = None
 
 
@@ -88,7 +89,7 @@ class ParseFileName:
 
 
 def get_open_files_in_dir(dir_name):
-    result = subprocess.run(['lsof', '-w', '-Fn', '+D', f'{dir_name}'], check=False, capture_output=True)
+    result = subprocess.run(['lsof', '-Fn', '-w' , '+D', f'{dir_name}'], check=False, capture_output=True)
     ret = result.stdout.decode('utf-8')
     err = result.stderr.decode('utf-8')
     if err:
