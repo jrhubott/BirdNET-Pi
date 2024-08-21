@@ -10,10 +10,13 @@ COPY docker_requirements.txt /app/requirements.txt
 RUN python3 -m pip install --root-user-action=ignore -r requirements.txt
 RUN apt-get update && apt-get install -y \
     sqlite3 \
-    caddy
+    caddy \
+    supervisor
 
 
-#Install script files
-COPY model/     /app/model/
-COPY homepage/  /app/homepage/
-COPY scripts/   /app/scripts/
+#Install files
+COPY model/     model/
+COPY homepage/  homepage/
+COPY scripts/   scripts/
+
+CMD ["/usr/bin/supervisord"]
