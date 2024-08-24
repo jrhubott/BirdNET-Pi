@@ -53,7 +53,7 @@ class Detection:
         self.common_name_safe = self.common_name.replace("'", "").replace(" ", "_")
         self.file_name = file_name
         self.file_name_extr = None
-        self.RTSP_id = RTSP_id;
+        self.RTSP_id = RTSP_id.replace("_", "");
 
 
 class ParseFileName:
