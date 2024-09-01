@@ -56,8 +56,8 @@ if(isset($_GET["latitude"])){
   $site_name = str_replace('\'', "", $site_name);
   $birdweather_id = $_GET["birdweather_id"];
   $apprise_input = $_GET['apprise_input'];
-  $apprise_notification_title = base64_decode($_GET['apprise_notification_title']);
-  $apprise_notification_body = base64_decode($_GET['apprise_notification_body']);
+  $apprise_notification_title = $_GET['apprise_notification_title'];
+  $apprise_notification_body = $_GET['apprise_notification_body'];
   $minimum_time_limit = $_GET['minimum_time_limit'];
   $flickr_api_key = $_GET['flickr_api_key'];
   $flickr_filter_email = $_GET["flickr_filter_email"];
@@ -67,13 +67,11 @@ if(isset($_GET["latitude"])){
   $timezone = $_GET["timezone"];
   $model = $_GET["model"];
   $sf_thresh = $_GET["sf_thresh"];
-
   if(isset($_GET['data_model_version'])) {
     $data_model_version = 2;
   } else {
     $data_model_version = 1;
   }
-
   $only_notify_species_names = $_GET['only_notify_species_names'];
   $only_notify_species_names_2 = $_GET['only_notify_species_names_2'];
 
@@ -132,7 +130,6 @@ if(isset($_GET["latitude"])){
       sleep(3);
     }
   }
-
   if ($model != $config['MODEL'] || $language != $config['DATABASE_LANG']){
     if(strlen($language) == 2){
 
@@ -214,23 +211,77 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
     $filename = $todaytable['File_Name'];
     $date = $todaytable['Date'];
     $time = $todaytable['Time'];
+    $week = $todaytable['Week'];
+    $latitude = $todaytable['Lat'];
+    $longitude = $todaytable['Lon'];
+    $cutoff = $todaytable['Cutoff'];
+    $sens = $todaytable['Sens'];
+    $overlap = $todaytable['Overlap'];
   }
 
-  $test_file = fopen($config["RECS_DIR"]."/"."StreamData"."/"."send_test_notification.txt", "w") or die("Unable to open file!");
- 
-  fwrite($test_file, "1.0".PHP_EOL);
-  fwrite($test_file, "3.0".PHP_EOL);
-  fwrite($test_file, $confidence.PHP_EOL);
-  fwrite($test_file, $sciname."_".$comname.PHP_EOL);
-  fwrite($test_file, $filename.PHP_EOL);
-  fwrite($test_file, $date."-birdnet-".$time.PHP_EOL);
-  fwrite($test_file, $_GET['apprise_notification_title'].PHP_EOL);
-  fwrite($test_file, $_GET['apprise_notification_body'].PHP_EOL);
-  fclose($test_file);
+  $title = $_GET['apprise_notification_title'];
+  $body = $_GET['apprise_notification_body'];
 
-  $apprise_test_config = fopen($home."/BirdNET-Pi/apprise_test.txt", "w") or die("Unable to open file!");
-  fwrite($apprise_test_config, $_GET['apprise_config']);
-  fclose($apprise_test_config);
+  if($config["BIRDNETPI_URL"] != "") {
+    $filename = $config["BIRDNETPI_URL"]."?filename=".$filename;
+  } else{
+    $filename = "http://".$_SERVER['SERVER_NAME']."/"."?filename=".$filename;
+  }
+
+  $friendlyfilename = "[Listen here](".$filename.")";
+
+  $wikiurl = "https://wikipedia.org/wiki/".preg_replace('/ /', '_', $sciname);
+
+  $attach="";
+  $exampleimage = "https://live.staticflickr.com/7430/27545810581_8bfa8289a3_c.jpg";
+  if (strpos($body, '$flickrimage') !== false) {
+      $attach = "--attach ".$exampleimage;
+  }
+  if (strpos($body, '{') === false) {
+      $exampleimage = "";
+  }
+
+  $title = str_replace("\$sciname", $sciname, $title);
+  $title = str_replace("\$comname", $comname, $title);
+  $title = str_replace("\$confidencepct", round($confidence*100), $title);
+  $title = str_replace("\$confidence", $confidence, $title);
+  $title = str_replace("\$listenurl", $filename, $title);
+  $title = str_replace("\$friendlyurl", $friendlyfilename, $title);
+  $title = str_replace("\$date", $date, $title);
+  $title = str_replace("\$time", $time, $title);
+  $title = str_replace("\$week", $week, $title);
+  $title = str_replace("\$latitude", $latitude, $title);
+  $title = str_replace("\$longitude", $longitude, $title);
+  $title = str_replace("\$cutoff", $cutoff, $title);
+  $title = str_replace("\$sens", $sens, $title);
+  $title = str_replace("\$overlap", $overlap, $title);
+  $title = str_replace("\$flickrimage", $exampleimage, $title);
+  $title = str_replace("\$wikiurl", $wikiurl, $title);
+  $title = str_replace("\$reason", 'Test message', $title);
+
+  $body = str_replace("\$sciname", $sciname, $body);
+  $body = str_replace("\$comname", $comname, $body);
+  $body = str_replace("\$confidencepct", round($confidence*100), $body);
+  $body = str_replace("\$confidence", $confidence, $body);
+  $body = str_replace("\$listenurl", $filename, $body);
+  $body = str_replace("\$friendlyurl", $friendlyfilename, $body);
+  $body = str_replace("\$date", $date, $body);
+  $body = str_replace("\$time", $time, $body);
+  $body = str_replace("\$week", $week, $body);
+  $body = str_replace("\$latitude", $latitude, $body);
+  $body = str_replace("\$longitude", $longitude, $body);
+  $body = str_replace("\$cutoff", $cutoff, $body);
+  $body = str_replace("\$sens", $sens, $body);
+  $body = str_replace("\$overlap", $overlap, $body);
+  $body = str_replace("\$flickrimage", $exampleimage, $body);
+  $body = str_replace("\$wikiurl", $wikiurl, $body);
+  $body = str_replace("\$reason", 'Test message', $body);
+
+  $temp = tmpfile();
+  $tpath = stream_get_meta_data($temp)['uri'];
+  fwrite($temp, $body);
+  echo "<pre class=\"bash\">".shell_exec($home."/BirdNET-Pi/birdnet/bin/apprise -vv --plugin-path ".$home."/.apprise/plugins "." -t '".escapeshellcmd($title)."' ".$attach." ".$cf." <".$tpath)."</pre>";
+  fclose($temp);
 
   die();
 }
@@ -257,7 +308,6 @@ $config = get_config($force_reload=true);
     }
   });
 }, false);
-
 function sendTestNotification(e) {
   document.getElementById("testsuccessmsg").innerHTML = "";
   e.classList.add("disabled");
@@ -492,9 +542,9 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       </dl>
       <p>Use the variables defined above to customize your notification title and body.</p>
       <label for="apprise_notification_title">Notification Title: </label>
-      <input name="apprise_notification_title" id="apprise_notification_title" style="width: 100%" type="text" value="<?php print($config['APPRISE_NOTIFICATION_TITLE']);?>" /><br>
+      <input name="apprise_notification_title" style="width: 100%" type="text" value="<?php print($config['APPRISE_NOTIFICATION_TITLE']);?>" /><br>
       <label for="apprise_notification_body">Notification Body: </label>
-      <input name="apprise_notification_body" id="apprise_notification_body" style="width: 100%" type="text" value='<?php print($config['APPRISE_NOTIFICATION_BODY']);?>' /><br>
+      <input name="apprise_notification_body" style="width: 100%" type="text" value='<?php print($config['APPRISE_NOTIFICATION_BODY']);?>' /><br>
       <input type="checkbox" name="apprise_notify_new_species" <?php if($config['APPRISE_NOTIFY_NEW_SPECIES'] == 1 && filesize($home."/BirdNET-Pi/apprise.txt") != 0) { echo "checked"; };?> >
       <label for="apprise_notify_new_species">Notify each new infrequent species detection (<5 visits per week)</label><br>
       <input type="checkbox" name="apprise_notify_new_species_each_day" <?php if($config['APPRISE_NOTIFY_NEW_SPECIES_EACH_DAY'] == 1 && filesize($home."/BirdNET-Pi/apprise.txt") != 0) { echo "checked"; };?> >
@@ -685,19 +735,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <input type="hidden" name="status" value="success">
       <input type="hidden" name="submit" value="settings">
 <div class="float">
-      <button type="submit" id="basicformsubmit" onclick="formSubmit()" name="view" value="Settings">
-
-<script type="text/javascript">
-    function formSubmit() {
-        if(document.getElementById('basicform').checkValidity()) {
-            document.getElementById('apprise_notification_title').value = btoa(document.getElementById('apprise_notification_title').value);
-            document.getElementById('apprise_notification_body').value = btoa(document.getElementById('apprise_notification_body').value);
-            document.getElementById('basicformsubmit').innerHTML = 'Updating... please wait.';
-            document.getElementById('basicformsubmit').classList.add('disabled');
-        }
-    }
-</script>
-
+      <button type="submit" id="basicformsubmit" onclick="if(document.getElementById('basicform').checkValidity()){this.innerHTML = 'Updating... please wait.';this.classList.add('disabled')}" name="view" value="Settings">
 <?php
 if(isset($_GET['status'])){
   echo '<script>alert("Settings successfully updated");</script>';
