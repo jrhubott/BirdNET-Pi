@@ -56,9 +56,7 @@ class Detection:
         self.scientific_name = species.split('_')[0]
         self.common_name = species.split('_')[1]
         self.common_name_safe = self.common_name.replace("'", "").replace(" ", "_")
-        self.file_name = file_name
         self.file_name_extr = None
-        self.RTSP_id = RTSP_id.replace("_", "").replace("-", "");
 
 
 class ParseFileName:
