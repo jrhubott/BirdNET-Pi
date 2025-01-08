@@ -42,18 +42,21 @@ def get_settings(settings_path='/etc/birdnet/birdnet.conf', force_reload=False):
 
 
 class Detection:
-    def __init__(self, start_time, stop_time, species, confidence, file_name, RTSP_id):
+    def __init__(self, file_date, start_time, stop_time, species, confidence):
         self.start = float(start_time)
         self.stop = float(stop_time)
+        self.datetime = file_date + datetime.timedelta(seconds=self.start)
+        self.date = self.datetime.strftime("%Y-%m-%d")
+        self.time = self.datetime.strftime("%H:%M:%S")
+        self.iso8601 = self.datetime.astimezone(get_localzone()).isoformat()
+        self.week = self.datetime.isocalendar()[1]
         self.confidence = round(float(confidence), 4)
         self.confidence_pct = round(self.confidence * 100)
         self.species = species
         self.scientific_name = species.split('_')[0]
         self.common_name = species.split('_')[1]
         self.common_name_safe = self.common_name.replace("'", "").replace(" ", "_")
-        self.file_name = file_name
         self.file_name_extr = None
-        self.RTSP_id = RTSP_id.replace("_", "").replace("-", "");
 
 
 class ParseFileName:
@@ -69,16 +72,6 @@ class ParseFileName:
         self.RTSP_id = ident_match.group() if ident_match is not None else ""
 
     @property
-    def date(self):
-        current_date = self.file_date.strftime("%Y-%m-%d")
-        return current_date
-
-    @property
-    def time(self):
-        current_time = self.file_date.strftime("%H:%M:%S")
-        return current_time
-
-    @property
     def iso8601(self):
         current_iso8601 = self.file_date.astimezone(get_localzone()).isoformat()
         return current_iso8601
@@ -90,7 +83,7 @@ class ParseFileName:
 
 
 def get_open_files_in_dir(dir_name):
-    result = subprocess.run(['lsof', '-Fn', '-w' , '+D', f'{dir_name}'], check=False, capture_output=True)
+    result = subprocess.run(['lsof', '-w', '-Fn', '+D', f'{dir_name}'], check=False, capture_output=True)
     ret = result.stdout.decode('utf-8')
     err = result.stderr.decode('utf-8')
     if err:

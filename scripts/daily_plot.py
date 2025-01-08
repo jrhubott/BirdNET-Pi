@@ -45,13 +45,13 @@ def show_values_on_bars(ax, label):
         # Species Count Total
         value = '{:n}'.format(p.get_width())
         bbox = {'facecolor': 'lightgrey', 'edgecolor': 'none', 'pad': 1.0}
-        match conf['COLOR_SCHEME']:
-            case "dark":
-                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
-            case "purple":
-                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='black')
-            case _:
-                ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color='darkgreen')
+        if conf['COLOR_SCHEME'] == "dark":
+            color = 'black'
+        else:
+            color = 'darkgreen'
+
+        ax.text(x, y, value, bbox=bbox, ha='center', va='center', size=9, color=color)
+
 
 def wrap_width(txt):
     # try to estimate wrap width
@@ -81,13 +81,12 @@ def create_plot(df_plt_today, now, is_top=None):
 
     # Set up plot axes and titles
     height = max(readings / 3, 0) + 1.06
-    match conf['COLOR_SCHEME']:
-        case "dark":
-            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
-        case "purple":
-            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='#F9F9F9')
-        case _:
-            f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor='none')
+    if conf['COLOR_SCHEME'] == "dark":
+        facecolor = 'darkgrey'
+    else:
+        facecolor = 'none'
+
+    f, axs = plt.subplots(1, 2, figsize=(10, height), gridspec_kw=dict(width_ratios=[3, 6]), facecolor=facecolor)
 
     # generate y-axis order for all figures based on frequency
     freq_order = df_plt_selection_today['Com_Name'].value_counts().index
@@ -101,16 +100,12 @@ def create_plot(df_plt_today, now, is_top=None):
     norm = plt.Normalize(confmax.values.min(), confmax.values.max())
     if is_top or is_top is None:
         # Set Palette for graphics
-        match conf['COLOR_SCHEME']:
-            case "dark":
-                pal = "Greys"
-                colors = plt.cm.Greys(norm(confmax)).tolist()
-            case "purple":
-                pal = "Purples"
-                colors = plt.cm.Purples(norm(confmax)).tolist()
-            case _:
-                pal = "Greens"
-                colors = plt.cm.Greens(norm(confmax)).tolist()
+        if conf['COLOR_SCHEME'] == "dark":
+            pal = "Greys"
+            colors = plt.cm.Greys(norm(confmax)).tolist()
+        else:
+            pal = "Greens"
+            colors = plt.cm.Greens(norm(confmax)).tolist()
         if is_top:
             plot_type = "Top"
         else:
@@ -125,7 +120,7 @@ def create_plot(df_plt_today, now, is_top=None):
 
     # Generate frequency plot
     plot = sns.countplot(y='Com_Name', hue='Com_Name', legend=False, data=df_plt_selection_today,
-                         palette=colors, order=freq_order, ax=axs[0], edgecolor='lightgrey')
+                         palette=dict(zip(confmax.index, colors)), order=freq_order, ax=axs[0], edgecolor='lightgrey')
 
     # Prints Max Confidence on bars
     show_values_on_bars(axs[0], confmax)
@@ -156,21 +151,15 @@ def create_plot(df_plt_today, now, is_top=None):
     plot = sns.heatmap(heat, norm=LogNorm(),  annot=True,  annot_kws={"fontsize": 7}, fmt="g", cmap=pal, square=False,
                        cbar=False, linewidths=0.5, linecolor="Grey", ax=axs[1], yticklabels=False)
 
-    plot.set_xticklabels(plot.get_xticklabels(), rotation=0, size=8)
-    plot.tick_params(right=False, top=True, labelright=False, labeltop=True,rotation=0)
-    
     # Set color and weight of tick label for current hour
     for label in plot.get_xticklabels():
         if int(label.get_text()) == now.hour:
-            match conf['COLOR_SCHEME']:
-                case "dark":
-                    label.set_color('blue')
-                case "purple":
-                    label.set_color('blue')
-                case _:
-                    label.set_color('yellow')
+            if conf['COLOR_SCHEME'] == "dark":
+                label.set_color('white')
+            else:
+                label.set_color('yellow')
 
-
+    plot.set_xticklabels(plot.get_xticklabels(), rotation=0, size=8)
 
     # Set heatmap border
     for _, spine in plot.spines.items():
@@ -180,7 +169,7 @@ def create_plot(df_plt_today, now, is_top=None):
     plot.set(xlabel="Hour of Day")
     # Set combined plot layout and titles
     y = 1 - 8 / (height * 100)
-    plt.suptitle(f"{plot_type} {readings} Last Updated: {now.strftime('%Y-%m-%d %H:%M')}", y=1)
+    plt.suptitle(f"{plot_type} {readings} Last Updated: {now.strftime('%Y-%m-%d %H:%M')}", y=y)
     f.tight_layout()
     top = 1 - 40 / (height * 100)
     f.subplots_adjust(left=0.125, right=0.9, top=top, wspace=0)

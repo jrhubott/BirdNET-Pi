@@ -230,8 +230,6 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
 
   $friendlyfilename = "[Listen here](".$filename.")";
 
-  $wikiurl = "https://wikipedia.org/wiki/".preg_replace('/ /', '_', $sciname);
-
   $attach="";
   $exampleimage = "https://live.staticflickr.com/7430/27545810581_8bfa8289a3_c.jpg";
   if (strpos($body, '$flickrimage') !== false) {
@@ -256,7 +254,6 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $title = str_replace("\$sens", $sens, $title);
   $title = str_replace("\$overlap", $overlap, $title);
   $title = str_replace("\$flickrimage", $exampleimage, $title);
-  $title = str_replace("\$wikiurl", $wikiurl, $title);
   $title = str_replace("\$reason", 'Test message', $title);
 
   $body = str_replace("\$sciname", $sciname, $body);
@@ -274,7 +271,6 @@ if(isset($_GET['sendtest']) && $_GET['sendtest'] == "true") {
   $body = str_replace("\$sens", $sens, $body);
   $body = str_replace("\$overlap", $overlap, $body);
   $body = str_replace("\$flickrimage", $exampleimage, $body);
-  $body = str_replace("\$wikiurl", $wikiurl, $body);
   $body = str_replace("\$reason", 'Test message', $body);
 
   $temp = tmpfile();
@@ -535,8 +531,6 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <dd>Overlap set in "Advanced Settings"</dd>
       <dt>$flickrimage</dt>
       <dd>A preview image of the detected species from Flickr. Set your API key below.</dd>
-      <dt>$wikiurl</dt>
-      <dd>A link to the Wikipedia page</dd>
       <dt>$reason</dt>
       <dd>The reason a notification was sent</dd>
       </dl>
@@ -662,7 +656,7 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <label for="color_scheme">Color scheme for the site : </label>
       <select name="color_scheme" class="testbtn">
       <?php
-      $scheme = array("light", "dark", "purple");
+      $scheme = array("light", "dark");
       foreach($scheme as $color_scheme){
           $isSelected = "";
           if($config['COLOR_SCHEME'] == $color_scheme){
