@@ -479,7 +479,7 @@ startAutoRefresh();
   transition: opacity 0.2s ease-in-out;
 }
 </style>
-<script src="static/spectrogram-player.js"></script>
+<script src="static/custom-audio-player.js"></script>
 <script>
 function generateMiniGraph(elem, comname) {
 
