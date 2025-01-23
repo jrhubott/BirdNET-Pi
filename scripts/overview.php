@@ -360,7 +360,7 @@ function loadDetectionIfNewExists(previous_detection_identifier=undefined) {
       loadFiveMostRecentDetections();
       refreshTopTen();
 
-      // Now that new HTML is inserted, re-run player init:
+      // Reinitialize custom audio players for newly loaded elements
       initCustomAudioPlayers();
     }
   }
@@ -400,15 +400,27 @@ function refreshTopTen() {
 }
 function refreshDetection() {
   if (!document.hidden) {
-    var videoelement = document.getElementsByTagName("video")[0];
-    if(typeof videoelement !== "undefined") {
-      // don't refresh the detection if the user is playing the previous one's audio, wait until they're finished
-      if(!!(videoelement.currentTime > 0 && !videoelement.paused && !videoelement.ended && videoelement.readyState > 2) == false) {
-        loadDetectionIfNewExists(videoelement.title);
-      }
-    } else{
-      // image or audio didn't load for some reason, force a refresh in 5 seconds
+    const audioPlayers = document.querySelectorAll(".custom-audio-player");
+
+    // If no custom-audio-player elements are found, refresh
+    if (audioPlayers.length === 0) {
       loadDetectionIfNewExists();
+      return;
+    }
+
+    // Check if any custom audio player is currently playing
+    let isPlaying = false;
+    audioPlayers.forEach((player) => {
+      const audioEl = player.querySelector("audio");
+      if (audioEl && audioEl.currentTime > 0 && !audioEl.paused && !audioEl.ended && audioEl.readyState > 2) {
+        isPlaying = true;
+      }
+    });
+
+    // If none are playing, refresh detections
+    if (!isPlaying) {
+      const currentIdentifier = audioPlayers[0]?.dataset.audioSrc || undefined;
+      loadDetectionIfNewExists(currentIdentifier);
     }
   }
 }
