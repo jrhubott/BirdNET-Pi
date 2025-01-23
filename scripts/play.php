@@ -238,11 +238,11 @@ function toggleLock(filename, type, elem) {
 function toggleShiftFreq(filename, shiftAction, elem) {
   const xhttp = new XMLHttpRequest();
   xhttp.onload = function() {
-    if (this.responseText == "OK") {
-      if (shiftAction == "shift") {
-        elem.setAttribute("src", "images/unshift.svg");
+    if(this.responseText == "OK"){
+      if(shiftAction == "shift") {
+        elem.setAttribute("src","images/unshift.svg");
         elem.setAttribute("title", "This file has been shifted down in frequency.");
-        elem.setAttribute("onclick", elem.getAttribute("onclick").replace("shift", "unshift"));
+        elem.setAttribute("onclick", elem.getAttribute("onclick").replace("shift","unshift"));
         console.log("shifted freqs of " + filename);
 
         const audioDiv = elem.parentNode.querySelector(".custom-audio-player");
@@ -251,13 +251,13 @@ function toggleShiftFreq(filename, shiftAction, elem) {
         } else {
           const atag = elem.parentNode.querySelector("a");
           if (atag) {
-            atag.setAttribute("href", atag.getAttribute("href").replace("/By_Date/", "/By_Date/shifted/"));
+            atag.setAttribute("href", atag.getAttribute("href").replace("/By_Date/","/By_Date/shifted/"));
           }
         }
       } else {
-        elem.setAttribute("src", "images/shift.svg");
+        elem.setAttribute("src","images/shift.svg");
         elem.setAttribute("title", "This file is not shifted in frequency.");
-        elem.setAttribute("onclick", elem.getAttribute("onclick").replace("unshift", "shift"));
+        elem.setAttribute("onclick", elem.getAttribute("onclick").replace("unshift","shift"));
         console.log("unshifted freqs of " + filename);
 
         const audioDiv = elem.parentNode.querySelector(".custom-audio-player");
@@ -266,22 +266,22 @@ function toggleShiftFreq(filename, shiftAction, elem) {
         } else {
           const atag = elem.parentNode.querySelector("a");
           if (atag) {
-            atag.setAttribute("href", atag.getAttribute("href").replace("/By_Date/shifted/", "/By_Date/"));
+            atag.setAttribute("href", atag.getAttribute("href").replace("/By_Date/shifted/","/By_Date/"));
           }
         }
       }
     }
   };
 
-  if (shiftAction == "shift") {
+  if(shiftAction == "shift") {
     console.log("shifting freqs of " + filename);
-    xhttp.open("GET", "play.php?shiftfile=" + filename + "&doshift=true", true);
+    xhttp.open("GET", "play.php?shiftfile="+filename+"&doshift=true", true);
   } else {
     console.log("unshifting freqs of " + filename);
-    xhttp.open("GET", "play.php?shiftfile=" + filename, true);
+    xhttp.open("GET", "play.php?shiftfile="+filename, true);  
   }
   xhttp.send();
-  elem.setAttribute("src", "images/spinner.gif");
+  elem.setAttribute("src","images/spinner.gif");
 }
 
 function changeDetection(filename,copylink=false) {
