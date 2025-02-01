@@ -1,11 +1,20 @@
 function initCustomAudioPlayers() {
   // =================== Config & Helpers ===================
-  const CONFIG = { LEFT_MARGIN_PERCENT: 6, RIGHT_MARGIN_PERCENT: 9, PROGRESS_BAR_UPDATE_INTERVAL: 20 };
+  const CONFIG = { LEFT_MARGIN_PERCENT: 6, RIGHT_MARGIN_PERCENT: 9, PROGRESS_BAR_UPDATE_INTERVAL: 20, BUFFER_TIME: 0.1 };
+
+  const debounce = (func, wait) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  };
 
   const icons = {
     play: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white"><path d="M8 5v14l11-7z"/></svg>`,
     pause: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
     dots: `<svg width="24" height="24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM12 22a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>`,
+    spinner: `<div style="width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; box-sizing: border-box; animation: ring-spin 1s linear infinite;"><style>@keyframes ring-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style></div>`
   };
 
   const safeGet = (k, fb) => {
@@ -16,7 +25,8 @@ function initCustomAudioPlayers() {
   };
 
   const savedGain = safeGet("customAudioPlayerGain", "Off");
-  const savedFilter = safeGet("customAudioPlayerFilter", "Off");
+  const savedHighpass = safeGet("customAudioPlayerFilterHigh", "Off");
+  const savedLowpass = safeGet("customAudioPlayerFilterLow", "Off");
 
   const applyStyles = (elem, styles) => Object.assign(elem.style, styles);
 
@@ -62,16 +72,15 @@ function initCustomAudioPlayers() {
     const audioSrc = player.dataset.audioSrc;
     const imageSrc = player.dataset.imageSrc;
 
-    // Audio element (lazy AudioContext creation below)
+    // Audio element
     const audioEl = document.createElement("audio");
-    audioEl.src = audioSrc;
-    audioEl.preload = "metadata";
+    audioEl.preload = "none";
     audioEl.setAttribute("onplay", "setLiveStreamVolume(0)");
     audioEl.setAttribute("onended", "setLiveStreamVolume(1)");
     audioEl.setAttribute("onpause", "setLiveStreamVolume(1)");
     player.appendChild(audioEl);
 
-    // Main wrapper + image
+    // Wrapper + image
     const wrapper = player.appendChild(document.createElement("div"));
     applyStyles(wrapper, { position: "relative" });
     const img = wrapper.appendChild(document.createElement("img"));
@@ -97,16 +106,27 @@ function initCustomAudioPlayers() {
       visibility: "visible",
     });
 
+    // Loading spinner
+    const loadingSpinner = document.createElement("div");
+    loadingSpinner.innerHTML = icons.spinner;
+    applyStyles(loadingSpinner, {
+      position: "absolute", top: "50%", left: "50%",
+      transform: "translate(-50%, -50%)", display: "none"
+    });
+    wrapper.appendChild(loadingSpinner);
+
     // =================== Overlay Buttons & Progress ===================
-    let audioCtx = null, sourceNode, gainNode, filterNode;
+    let audioCtx = null, sourceNode, gainNode, filterNodeHigh, filterNodeLow;
     const gainOptions = ["Off", "x2", "x4", "x8", "x16"];
-    const gainValues = { Off: 1, x2: 2, x4: 4, x8: 8, x16:16 };
+    const gainValues = { Off: 1, x2: 2, x4: 4, x8: 8, x16: 16 };
     let activeGain = gainOptions.includes(savedGain) ? savedGain : "Off";
 
-    const filterOptions = ["Off", "250", "500", "1000"];
-    let activeFilterOption = filterOptions.includes(savedFilter) ? savedFilter : "Off";
+    const highpassOptions = ["Off", "250", "500", "1000"];
+    let activeHighpassOption = highpassOptions.includes(savedHighpass) ? savedHighpass : "Off";
 
-    // Initialize or resume audio context on demand
+    const lowpassOptions = ["Off", "2000", "4000", "8000"];
+    let activeLowpassOption = lowpassOptions.includes(savedLowpass) ? savedLowpass : "Off";
+
     const initAudioContext = async () => {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -122,13 +142,15 @@ function initCustomAudioPlayers() {
       if (!audioCtx) return;
       sourceNode.disconnect();
       gainNode.disconnect();
-      if (filterNode) filterNode.disconnect();
-      if (filterNode) sourceNode.connect(filterNode).connect(gainNode);
-      else sourceNode.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
+      if (filterNodeHigh) filterNodeHigh.disconnect();
+      if (filterNodeLow) filterNodeLow.disconnect();
+
+      let currentChain = sourceNode;
+      if (filterNodeHigh) { currentChain.connect(filterNodeHigh); currentChain = filterNodeHigh; }
+      if (filterNodeLow) { currentChain.connect(filterNodeLow); currentChain = filterNodeLow; }
+      currentChain.connect(gainNode).connect(audioCtx.destination);
     };
 
-    // Gain / Filter set
     const setActiveGain = async (val) => {
       activeGain = val;
       if (activeGain !== "Off") {
@@ -137,39 +159,65 @@ function initCustomAudioPlayers() {
       } else if (gainNode) {
         gainNode.gain.value = 1;
       }
-      gainButtons.forEach((b) => {
-        b.style.textDecoration = b.dataset.gain === activeGain ? "underline" : "none";
-      });
+      gainButtons.forEach(b => b.style.textDecoration = b.dataset.gain === activeGain ? "underline" : "none");
       safeSet("customAudioPlayerGain", activeGain);
     };
-    const setActiveFilter = async (val) => {
-      activeFilterOption = val;
-      if (activeFilterOption !== "Off") {
+
+    const setActiveHighpass = async (val) => {
+      activeHighpassOption = val;
+      if (activeHighpassOption !== "Off") {
         await initAudioContext();
-        if (!filterNode) {
-          filterNode = audioCtx.createBiquadFilter();
-          filterNode.type = "highpass";
+        if (!filterNodeHigh) {
+          filterNodeHigh = audioCtx.createBiquadFilter();
+          filterNodeHigh.type = "highpass";
         }
-        filterNode.frequency.value = parseFloat(activeFilterOption);
-      } else if (filterNode) {
-        filterNode.disconnect(); 
-        filterNode = null;
+        filterNodeHigh.frequency.value = parseFloat(activeHighpassOption);
+      } else if (filterNodeHigh) {
+        filterNodeHigh.disconnect();
+        filterNodeHigh = null;
       }
       rebuildAudioChain();
-      filterButtons.forEach((b) => {
-        b.style.textDecoration = b.dataset.filter === activeFilterOption ? "underline" : "none";
-      });
-      safeSet("customAudioPlayerFilter", activeFilterOption);
+      highpassButtons.forEach(b => b.style.textDecoration = b.dataset.filter === activeHighpassOption ? "underline" : "none");
+      safeSet("customAudioPlayerFilterHigh", activeHighpassOption);
     };
 
-    // Play/Pause
+    const setActiveLowpass = async (val) => {
+      activeLowpassOption = val;
+      if (activeLowpassOption !== "Off") {
+        await initAudioContext();
+        if (!filterNodeLow) {
+          filterNodeLow = audioCtx.createBiquadFilter();
+          filterNodeLow.type = "lowpass";
+        }
+        filterNodeLow.frequency.value = parseFloat(activeLowpassOption);
+      } else if (filterNodeLow) {
+        filterNodeLow.disconnect();
+        filterNodeLow = null;
+      }
+      rebuildAudioChain();
+      lowpassButtons.forEach(b => b.style.textDecoration = b.dataset.filter === activeLowpassOption ? "underline" : "none");
+      safeSet("customAudioPlayerFilterLow", activeLowpassOption);
+    };
+
+    // Play/Pause with Debounce
+    const debouncedPlayPause = debounce(async () => {
+      await initAudioContext();
+      if (audioEl.paused) {
+        if (!audioEl.src) {
+          audioEl.src = audioSrc;
+          await audioEl.load();
+        }
+        audioEl.currentTime += CONFIG.BUFFER_TIME;
+        audioEl.play();
+      } else {
+        audioEl.pause();
+      }
+    }, 100);
+
     const playBtn = createButton(overlay, {
       html: icons.play,
       styles: iconBtnStyle,
-      onClick: async () => {
-        await initAudioContext();
-        audioEl.paused ? audioEl.play() : audioEl.pause();
-      },
+      onClick: debouncedPlayPause,
     });
 
     // Progress bar
@@ -225,7 +273,7 @@ function initCustomAudioPlayers() {
             const ct = resp.headers.get("content-type");
             if (ct) enc = ct.split("/")[1]?.toUpperCase() || "unknown";
           }
-          const audioData = await fetch(audioSrc).then((r) => r.arrayBuffer());
+          const audioData = await fetch(audioSrc).then(r => r.arrayBuffer());
           const decCtx = new (window.AudioContext || window.webkitAudioContext)();
           const decoded = await decCtx.decodeAudioData(audioData);
           sampleRate = decoded.sampleRate;
@@ -245,7 +293,7 @@ Channels: ${channels}`);
       styles: textBtnStyle,
       onClick: async () => {
         try {
-          const blob = await fetch(audioSrc).then((r) => r.blob());
+          const blob = await fetch(audioSrc).then(r => r.blob());
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
@@ -276,7 +324,8 @@ Channels: ${channels}`);
     };
 
     const gainContainer = createOptionSection("Gain:");
-    const filterContainer = createOptionSection("HighPass (Hz):");
+    const highpassContainer = createOptionSection("HighPass (Hz):");
+    const lowpassContainer = createOptionSection("LowPass (Hz):");
 
     // Create gain buttons
     const gainButtons = gainOptions.map((opt) =>
@@ -285,17 +334,25 @@ Channels: ${channels}`);
         onClick: () => setActiveGain(opt),
       })
     );
-    // Create filter buttons
-    const filterButtons = filterOptions.map((opt) =>
-      createButton(filterContainer, {
+    // Create highpass buttons
+    const highpassButtons = highpassOptions.map((opt) =>
+      createButton(highpassContainer, {
         text: opt, data: { filter: opt }, styles: optionBtnStyle,
-        onClick: () => setActiveFilter(opt),
+        onClick: () => setActiveHighpass(opt),
+      })
+    );
+    // Create lowpass buttons
+    const lowpassButtons = lowpassOptions.map((opt) =>
+      createButton(lowpassContainer, {
+        text: opt, data: { filter: opt }, styles: optionBtnStyle,
+        onClick: () => setActiveLowpass(opt),
       })
     );
 
     // Sync with saved or default
     setActiveGain(activeGain);
-    setActiveFilter(activeFilterOption);
+    setActiveHighpass(activeHighpassOption);
+    setActiveLowpass(activeLowpassOption);
 
     // =================== Play/Pause/Progress Listeners ===================
     let intervalId;
@@ -320,6 +377,12 @@ Channels: ${channels}`);
       clearProgressInterval();
     });
     audioEl.addEventListener("ended", () => clearProgressInterval());
+    audioEl.addEventListener("waiting", () => {
+      loadingSpinner.style.display = "block";
+    });
+    audioEl.addEventListener("canplay", () => {
+      loadingSpinner.style.display = "none";
+    });
 
     progress.addEventListener("input", () => {
       if (!audioEl.duration) return;

@@ -538,13 +538,11 @@ function refreshTopTen() {
 function refreshDetection() {
   if (!document.hidden) {
     const audioPlayers = document.querySelectorAll(".custom-audio-player");
-
     // If no custom-audio-player elements are found, refresh
     if (audioPlayers.length === 0) {
       loadDetectionIfNewExists();
       return;
     }
-
     // Check if any custom audio player is currently playing
     let isPlaying = false;
     audioPlayers.forEach((player) => {
@@ -553,7 +551,6 @@ function refreshDetection() {
         isPlaying = true;
       }
     });
-
     // If none are playing, refresh detections
     if (!isPlaying) {
       const currentIdentifier = audioPlayers[0]?.dataset.audioSrc || undefined;

@@ -266,13 +266,12 @@ function toggleShiftFreq(filename, shiftAction, elem) {
         } else {
           const atag = elem.parentNode.querySelector("a");
           if (atag) {
-            atag.setAttribute("href", atag.getAttribute("href").replace("/By_Date/shifted/","/By_Date/"));
+            atag.setAttribute("href", atag.getAttribute("href").replace("/By_Date/shifted/", "/By_Date/"));
           }
         }
       }
     }
-  };
-
+  }
   if(shiftAction == "shift") {
     console.log("shifting freqs of " + filename);
     xhttp.open("GET", "play.php?shiftfile="+filename+"&doshift=true", true);
